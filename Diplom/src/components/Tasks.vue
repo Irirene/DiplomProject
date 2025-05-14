@@ -23,7 +23,7 @@
 <script>
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridVue } from "ag-grid-vue3";
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
 import AddForm from "./UI/AddForm.vue";
@@ -37,6 +37,10 @@ export default {
   },
   props: {
     taskNumberFilter: {
+      type: Object,
+      required: true,
+    },
+    deletedFilter: {
       type: Object,
       required: true,
     },
@@ -57,6 +61,15 @@ export default {
               field: field.FIELD_CODE,
               sortable: false,
               filter: false,
+              width: 160,
+              suppressMovable: true,
+              cellStyle: { 
+                display: 'flex', 
+                // justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                backgroundColor: '#CFE1F4'
+              },
             }));
         }
         if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
@@ -66,17 +79,25 @@ export default {
         console.error("Ошибка при загрузке данных:", error);
       }
     });
-
-    //фильтр "№ задания"
+    
     const filteredRowData = computed(() => {
-      if (!props.taskNumberFilter.enabled || !props.taskNumberFilter.input) {
-        return rowData.value;
+      let filtered = rowData.value;
+
+      // Фильтр № задания
+      if (props.taskNumberFilter.enabled && props.taskNumberFilter.input) {
+        const filterValue = props.taskNumberFilter.input.toLowerCase();
+        filtered = filtered.filter((item) => {
+          const fieldValue = item.ID_AEX_TRIP ? String(item.ID_AEX_TRIP).toLowerCase() : "";
+          return fieldValue.includes(filterValue);
+        });
       }
-      const filterValue = props.taskNumberFilter.input.toLowerCase();
-      return rowData.value.filter((item) => {
-        const fieldValue = item.ID_AEX_TRIP ? String(item.ID_AEX_TRIP).toLowerCase() : "";
-        return fieldValue.includes(filterValue);
-      });
+
+      // Фильтр "Удалённые"
+      if (!props.deletedFilter.enabled || props.deletedFilter.value === "no") {
+        filtered = filtered.filter((item) => item.AEX_TRIP_DEL == 0);
+      }
+
+      return filtered;
     });
 
     return {
@@ -86,6 +107,7 @@ export default {
   },
 };
 </script>
+
 
 
 <style>
@@ -108,6 +130,7 @@ export default {
     min-height: 0;
     height: 100%;
 }
+
 h5{
     color: #4D7CBF;
     padding: 0;
@@ -131,17 +154,13 @@ button{
     background-color: white;
 }
 
-.ag-cell{
-    background-color: #CFE1F4;
-}
-
 .ag-header{
     background-color: #4D7CBF;    
 }
 
-.task-grid{
+/* .task-grid{
     display: flex;
-}
+} */
 
 .buttons {
   display: flex;

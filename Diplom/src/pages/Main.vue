@@ -2,11 +2,15 @@
   <div :class="['app-grid', { 'with-right': showUnRequests }]">
 
     <Header class="header"></Header>
-    <Filters class="filters" 
+    <Filters class="filters"
+    @update-deleted-filter="onDeletedFilterUpdate" 
     @update-task-number-filter="onTaskNumberFilterUpdate"></Filters>
 
     <div class="main-content">
-      <Tasks class="task-grid" :taskNumberFilter="taskNumberFilter"></Tasks>
+      <Tasks class="task-grid" 
+      :taskNumberFilter="taskNumberFilter"
+      :deletedFilter="deletedFilter"></Tasks>
+
       <ButtonC class="btn-buttom" @click="toggleRequests">
         {{ showRequests ? 'Скрыть заявки' : 'Показать заявки' }}
       </ButtonC>
@@ -61,18 +65,29 @@ export default {
         enabled: false,
         input: ''
       },
+
+      deletedFilter: {
+        enabled: false,
+        value: 'no',
+      },
     };
   },
   methods: {
     toggleRequests() {
       this.showRequests = !this.showRequests;
     },
+
     toggleUnRequests() {
       this.showUnRequests = !this.showUnRequests;
     },
+
     onTaskNumberFilterUpdate(filter) {
       this.taskNumberFilter = filter;
-    }
+    },
+    
+    onDeletedFilterUpdate(filter) {
+      this.deletedFilter = filter;
+    },
   }
 }
 </script>

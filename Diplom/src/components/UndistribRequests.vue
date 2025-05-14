@@ -40,6 +40,15 @@ export default {
                         //встроенная фильтрация и сортировка
                         sortable: false,
                         filter: false,
+                        width: 150,
+                        suppressMovable: true,
+                        cellStyle: { 
+                            display: 'flex', 
+                            // justifyContent: 'center',
+                            alignItems: 'center',
+                            height: '100%',
+                            backgroundColor: '#FFF9EF',
+                        }
                     }));
                 }
                 if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {

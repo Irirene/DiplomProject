@@ -5,7 +5,8 @@
   <fieldset class="filter first_row">
     <legend>
       <label class="filter_legend-label">
-        <input type="checkbox" v-model="deletedFilter.enabled"  />
+        <input type="checkbox" v-model="deletedFilter.enabled" 
+        @change="emitDeletedFilter"/>
         Удалённые
       </label>
     </legend>
@@ -17,6 +18,7 @@
           value="yes"
           :disabled="!deletedFilter.enabled"
           name="deleted-filter"
+          @change="emitDeletedFilter"
         />
         Да
       </label>
@@ -27,6 +29,7 @@
           value="no"
           :disabled="!deletedFilter.enabled"
           name="deleted-filter"
+          @change="emitDeletedFilter"
         />
         Нет
       </label>
@@ -88,9 +91,10 @@
     <div class="filter_inputs">
       <select v-model="numberFilter.selected" :disabled="!numberFilter.enabled" class="filter_select">
         <option value="">abc...</option>
-        <option v-for="search in searches" :key="search" :value="search">{{ search }}</option>
+        <option v-for="search in searches" :key="search" :value ="search">{{ search }}</option>
       </select>
-      <input type="text" v-model="numberFilter.input" 
+      <input type="text"
+      v-model="numberFilter.input" 
       :disabled="!numberFilter.enabled" 
       placeholder="Введите номер"
       class="filter_input"></input>
@@ -243,7 +247,7 @@ data() {
 
     deletedFilter: {
       enabled: false,
-      value: ''
+      value: 'no'
     },
 
     dateFilter:{
@@ -260,6 +264,7 @@ data() {
 
     numberFilter: {
     enabled: false,
+    selected: '',
     input: ''
     },
 
@@ -305,12 +310,20 @@ data() {
   }
 },
 methods: {
+
     emitFilter() {
       this.$emit('update-task-number-filter', {
         enabled: this.taskNumberFilter.enabled,
         input: this.taskNumberFilter.input.trim()
       });
-    }
+    },
+
+    emitDeletedFilter() {
+      this.$emit('update-deleted-filter', {
+        enabled: this.deletedFilter.enabled,
+        value: this.deletedFilter.value,
+      });
+    },
   }
 }
 </script>
