@@ -2,10 +2,11 @@
   <div :class="['app-grid', { 'with-right': showUnRequests }]">
 
     <Header class="header"></Header>
-    <Filters class="filters"></Filters>
+    <Filters class="filters" 
+    @update-task-number-filter="onTaskNumberFilterUpdate"></Filters>
 
     <div class="main-content">
-      <Tasks class="task-grid"></Tasks>
+      <Tasks class="task-grid" :taskNumberFilter="taskNumberFilter"></Tasks>
       <ButtonC class="btn-buttom" @click="toggleRequests">
         {{ showRequests ? 'Скрыть заявки' : 'Показать заявки' }}
       </ButtonC>
@@ -54,6 +55,12 @@ export default {
     return {
       showRequests: false,
       showUnRequests: false,
+
+      //фильтры
+      taskNumberFilter: {
+        enabled: false,
+        input: ''
+      },
     };
   },
   methods: {
@@ -62,6 +69,9 @@ export default {
     },
     toggleUnRequests() {
       this.showUnRequests = !this.showUnRequests;
+    },
+    onTaskNumberFilterUpdate(filter) {
+      this.taskNumberFilter = filter;
     }
   }
 }

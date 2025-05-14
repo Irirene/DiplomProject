@@ -1,76 +1,92 @@
 <template>
-<div class="tasks-outer">
+  <div class="tasks-outer">
     <div class="buttons">
-        <AddForm></AddForm>
-        <button class="task_buttons"><img src="/src/images/edit.png" alt=""></button>
-        <button class="task_buttons"><img src="/src/images/del.png" alt=""></button>
+      <AddForm></AddForm>
+      <button class="task_buttons"><img src="/src/images/edit.png" alt="" /></button>
+      <button class="task_buttons"><img src="/src/images/del.png" alt="" /></button>
     </div>
-        
+
     <h5>Список заданий экспедитору</h5>
 
     <div class="tasks-grid-row">
-        <ag-grid-vue
-            class="task-list ag-theme-alpine"
-            :rowData="rowData"
-            :columnDefs="columnDefs"
-            rowSelection="multiple"             
-        >
-        </ag-grid-vue>
+      <ag-grid-vue
+        class="task-list ag-theme-alpine"
+        :rowData="filteredRowData"
+        :columnDefs="columnDefs"
+        rowSelection="multiple"
+      >
+      </ag-grid-vue>
     </div>
-</div>
-
+  </div>
 </template>
 
-
-
 <script>
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridVue } from "ag-grid-vue3";
-import { ref, onMounted } from 'vue';
-import "ag-grid-community/styles/ag-theme-alpine.css"
+import { ref, onMounted, computed, watch } from "vue";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import AddForm from './UI/AddForm.vue';
+import AddForm from "./UI/AddForm.vue";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-
-
 export default {
-    components: {
-        AgGridVue, AddForm
+  components: {
+    AgGridVue,
+    AddForm,
+  },
+  props: {
+    taskNumberFilter: {
+      type: Object,
+      required: true,
     },
-    setup() {
-        const columnDefs = ref([]);
-        const rowData = ref([]);
-        
-        onMounted(async () => {
-            try {
-                const response = await fetch("/tasks.json");
-                const data = await response.json();
-                if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
-                    columnDefs.value = data.FieldsOut
-                    .filter((field) => field.FIELD_VISIBLE === "1")
-                    .map((field) => ({
-                        headerName: field.FIELD_NAME,
-                        field: field.FIELD_CODE,
-                        //встроенная фильтрация и сортировка
-                        sortable: false,
-                        filter: false,
-                    }));
-                }
-                if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
-                    rowData.value = data.ALL_DATA.result;
-                }
-            } catch (error) {
-                console.error("Ошибка при загрузке данных:", error);
-            }
-        });
-        return {
-            columnDefs,
-            rowData,
-        };},
+  },
+  setup(props) {
+    const columnDefs = ref([]);
+    const rowData = ref([]);
+
+    onMounted(async () => {
+      try {
+        const response = await fetch("/tasks.json");
+        const data = await response.json();
+        if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
+          columnDefs.value = data.FieldsOut
+            .filter((field) => field.FIELD_VISIBLE === "1")
+            .map((field) => ({
+              headerName: field.FIELD_NAME,
+              field: field.FIELD_CODE,
+              sortable: false,
+              filter: false,
+            }));
+        }
+        if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
+          rowData.value = data.ALL_DATA.result;
+        }
+      } catch (error) {
+        console.error("Ошибка при загрузке данных:", error);
+      }
+    });
+
+    //фильтр "№ задания"
+    const filteredRowData = computed(() => {
+      if (!props.taskNumberFilter.enabled || !props.taskNumberFilter.input) {
+        return rowData.value;
+      }
+      const filterValue = props.taskNumberFilter.input.toLowerCase();
+      return rowData.value.filter((item) => {
+        const fieldValue = item.ID_AEX_TRIP ? String(item.ID_AEX_TRIP).toLowerCase() : "";
+        return fieldValue.includes(filterValue);
+      });
+    });
+
+    return {
+      columnDefs,
+      filteredRowData,
+    };
+  },
 };
 </script>
+
 
 <style>
 .tasks-outer {

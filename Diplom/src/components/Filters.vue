@@ -5,7 +5,7 @@
   <fieldset class="filter first_row">
     <legend>
       <label class="filter_legend-label">
-        <input type="checkbox" v-model="deletedFilter.enabled" />
+        <input type="checkbox" v-model="deletedFilter.enabled"  />
         Удалённые
       </label>
     </legend>
@@ -152,14 +152,17 @@
   <fieldset class="filter second_row">
     <legend>
       <label class="filter_legend-label">
-        <input type="checkbox" v-model="taskNumberFilter.enabled" />
+        <input type="checkbox" v-model="taskNumberFilter.enabled"
+        @change="emitFilter" />
         № задания
       </label>
     </legend>
     <div class="filter_inputs">
-      <input type="text" v-model="taskNumberFilter.input" 
+      <input type="text" 
+      v-model="taskNumberFilter.input" 
       :disabled="!taskNumberFilter.enabled" 
-      placeholder="Введите номер задания"></input>
+      placeholder="Введите номер задания"
+      @change="emitFilter"></input>
     </div>
   </fieldset>
 
@@ -236,61 +239,79 @@
 export default {
 data() {
   return {
-    searches: ['...abc', '...abc...', 'abc'],    
+    searches: ['...abc', '...abc...', 'abc'],  
+
     deletedFilter: {
       enabled: false,
       value: ''
     },
+
     dateFilter:{
       enabled: false,
       from: '',
       to: ''
       },
+
     townFilter: {
       enabled: false,
       town: ''
     },
     towns: ['Москва', 'Санкт-Петербург', 'Новосибирск'],
+
     numberFilter: {
     enabled: false,
-    selected: '',
     input: ''
     },
+
     stationFilter: {
       enabled: false,
       station: ""
     },
     stations: ['Москва', 'Санкт-Петербург', 'Новосибирск'],
+
     sdgFilter: {
       enabled: false,
       sdg: ""
     },
+
     transportFilter: {
       enabled: false,
       vid: ""
-    },
+    },    
     vids: ['Обычный', '1', '5к'],
+
     taskNumberFilter: {
     enabled: false,
     input: ''
     },
+
     expeditorFilter: {
     enabled: false,
     selected: '',
     input: ''
     },
+
     cargoNameFilter: {
     enabled: false,
     selected: '',
     input: ''
     },
+
     clientFilter: {
     enabled: false,
     selected: '',
     input: ''
     },
   }
-}
+},
+methods: {
+    emitFilter() {
+      this.$emit('update-task-number-filter', {
+        enabled: this.taskNumberFilter.enabled,
+        input: this.taskNumberFilter.input.trim()
+      });
+    }
+  }
 }
 </script>
 
@@ -357,8 +378,10 @@ input {
 input[type="radio"]:disabled,
 input[type="checkbox"]:disabled,
 input[type="text"]:disabled,
-input[type="date"]:disabled {
-  opacity: 0.6;
+input[type="date"]:disabled,
+select:disabled {
+
+  opacity: 0.5;
 }
 
 input[type="radio"], 
