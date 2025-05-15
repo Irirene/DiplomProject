@@ -48,7 +48,10 @@ export default {
                             alignItems: 'center',
                             height: '100%',
                             backgroundColor: '#FFF9EF',
-                        }
+                        },
+                        headerStyle:{
+                            backgroundColor: '#4D7CBF',
+                        },
                     }));
                 }
                 if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
@@ -67,9 +70,9 @@ export default {
 
 <style scoped>
 
-.ag-cell{
+/* .ag-cell{
     background-color: #FFF9EF;
-}
+} */
 
 .unrequests-list{
     /* width: 100; */

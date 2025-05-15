@@ -8,7 +8,7 @@
 
     <h5>Список заданий экспедитору</h5>
 
-    <div class="tasks-grid-row">
+    <div class="tasks-grid">
       <ag-grid-vue
         class="task-list ag-theme-alpine"
         :rowData="filteredRowData"
@@ -32,9 +32,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default {
   components: {
-    AgGridVue,
-    AddForm,
+    AgGridVue, AddForm,
   },
+
   props: {
     taskNumberFilter: {
       type: Object,
@@ -45,6 +45,7 @@ export default {
       required: true,
     },
   },
+
   setup(props) {
     const columnDefs = ref([]);
     const rowData = ref([]);
@@ -67,8 +68,11 @@ export default {
                 display: 'flex', 
                 // justifyContent: 'center',
                 alignItems: 'center',
-                height: '100%',
+                // height: '100%',
                 backgroundColor: '#CFE1F4'
+              },
+              headerStyle:{
+                backgroundColor: '#4D7CBF',
               },
             }));
         }
@@ -96,7 +100,7 @@ export default {
       if (!props.deletedFilter.enabled || props.deletedFilter.value === "no") {
         filtered = filtered.filter((item) => item.AEX_TRIP_DEL == 0);
       }
-
+      
       return filtered;
     });
 
@@ -118,7 +122,7 @@ export default {
   min-height: 0;
 }
 
-.tasks-grid-row {
+.tasks-grid{
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -154,9 +158,9 @@ button{
     background-color: white;
 }
 
-.ag-header{
+/* .ag-header{
     background-color: #4D7CBF;    
-}
+} */
 
 /* .task-grid{
     display: flex;

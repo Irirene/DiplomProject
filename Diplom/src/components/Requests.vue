@@ -59,6 +59,9 @@ export default {
                             height: '100%',
                             backgroundColor: '#FFF9EF'
                         },
+                        headerStyle:{
+                            backgroundColor: '#4D7CBF',
+                        },
                     }));
                 }
                 if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
@@ -84,9 +87,9 @@ export default {
     grid-template-rows: auto;    
 }
 
-.requests-list{
-    width: 100;
-    height: 250px;
+.request-table{
+    /* width: 100; */
+    height: 100%;
 }
 
 </style>

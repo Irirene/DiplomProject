@@ -157,7 +157,7 @@
     <legend>
       <label class="filter_legend-label">
         <input type="checkbox" v-model="taskNumberFilter.enabled"
-        @change="emitFilter" />
+        @change="emitTaskNumberFilter" />
         № задания
       </label>
     </legend>
@@ -166,7 +166,7 @@
       v-model="taskNumberFilter.input" 
       :disabled="!taskNumberFilter.enabled" 
       placeholder="Введите номер задания"
-      @change="emitFilter"></input>
+      @change="emitTaskNumberFilter"></input>
     </div>
   </fieldset>
 
@@ -311,7 +311,7 @@ data() {
 },
 methods: {
 
-    emitFilter() {
+    emitTaskNumberFilter() {
       this.$emit('update-task-number-filter', {
         enabled: this.taskNumberFilter.enabled,
         input: this.taskNumberFilter.input.trim()
