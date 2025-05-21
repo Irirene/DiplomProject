@@ -135,7 +135,10 @@ export default {
 
   methods: {
   onRowClicked(event) {
-    this.$emit('select-trip', event.data.ID_AEX_TRIP);
+    this.$emit('select-task', {
+      id: event.data.ID_AEX_TRIP,
+      date: event.data.AEX_TRIP_DT_BG
+    });
   }
 }
 };

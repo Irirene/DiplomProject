@@ -12,8 +12,10 @@
 <script>
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridVue } from "ag-grid-vue3";
-import { ref, onMounted } from 'vue';
 import "ag-grid-community/styles/ag-theme-alpine.css"
+
+import { ref, watch, onMounted } from 'vue';
+import axios from 'axios';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -23,14 +25,51 @@ export default {
     components: {
         AgGridVue,
     },
-    setup() {
+
+    props: {
+    taskId: { type: String, default: null },
+    taskDate: { type: String, default: null }
+    },
+
+    setup(props) {
         const columnDefs = ref([]);
         const rowData = ref([]);
-        
-        onMounted(async () => {
+
+        watch(() => [props.taskId, props.taskDate], async ([newTaskId, newTaskDate]) => {
+            if (!newTaskId || !newTaskDate) return;
+            await GetUnRequests(newTaskId, newTaskDate);
+        }, { immediate: true });
+
+
+        async function GetUnRequests(taskId, taskDate) {
             try {
-                const response = await fetch("/unrequests.json");
-                const data = await response.json();
+                const session = localStorage.getItem("session");
+                const dateWithTime = props.tripDate;
+                const onlyDate = dateWithTime ? dateWithTime.split(' ')[0] : '';
+
+                const body = {
+                    "init": {
+                        "type": "table",
+                        "report": "at.aexTTNTripAexoFree.r"
+                    },
+                    "params": {
+                        "DATA_S": onlyDate,
+                        "ID_AEX_TRIP": taskId
+                    }
+                };
+                
+                const response = await axios.post(
+                    "http://localhost:8010/proxy/aextrip/rt",
+                    body,
+                    {
+                        headers: {
+                            Pragma: `${session}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+                
+                const data = response.data;
                 if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
                     columnDefs.value = data.FieldsOut
                     .filter((field) => field.FIELD_VISIBLE === "1")
@@ -59,8 +98,9 @@ export default {
                 }
             } catch (error) {
                 console.error("Ошибка при загрузке данных:", error);
-            }
-        });
+            }        
+        }
+
         return {
             columnDefs,
             rowData,

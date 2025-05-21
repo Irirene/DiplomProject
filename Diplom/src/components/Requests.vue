@@ -37,19 +37,19 @@ export default {
     },
 
     props: {
-        tripId: { type: String, required: true }
+        taskId: { type: String, required: true }
     },
 
     setup(props) {
         const columnDefs = ref([]);
         const rowData = ref([]);
 
-        watch(() => props.tripId, async (newTripId) => {
-            if (!newTripId) return;
-            await GetRequests(newTripId);
+        watch(() => props.taskId, async (newTaskId) => {
+            if (!newTaskId) return;
+            await GetRequests(newTaskId);
         }, { immediate: true });
 
-        async function GetRequests(tripId) {
+        async function GetRequests(taskId) {
             try {
                 const session = localStorage.getItem("session");
                 
@@ -59,7 +59,7 @@ export default {
                         "report": "at.aexTTNTrip.r"
                     },
                     "params": {
-                        "ID_AEX_TRIP": tripId
+                        "ID_AEX_TRIP": taskId
                     }
                 };
                 
