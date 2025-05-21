@@ -3,9 +3,9 @@
 
     
     <div class="auth">
-        <form @submit.prevent="handleLogin">
+        <form>
             <h4>Авторизации</h4>
-            
+
             <input 
             v-model="login"
             class="input"
@@ -15,17 +15,22 @@
             <input 
             v-model="password"
             class="input"
-            type="text"
+            type="password"
             placeholder="Пароль">
 
-            <button class="btn">Войти</button>
+            <div class="btn-line">
+            <button type="button" class="btn" @click="reg">Войти</button>
+            <button type="button" class="btn" @click="logout">Выйти</button>
+            </div>
+
         </form>
     </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue';
-import api from '@/api';
+import axios from 'axios';
+// import api from '@/api';
 
 export default {
         components:  {
@@ -34,36 +39,64 @@ export default {
 
         data(){
             return{
-                login: 'АндиеваИК',
-                password: '448257'
+                login: '', //АндиеваИК
+                password: '' //448257
             }
         },
 
-        methods:{async handleLogin() {
-      try {
+        methods: {
+            async reg() {
+                try {
+                    //Получение сессии
+                    const sessionResponse = await axios.post(
+                        'http://localhost:8010/proxy/aextrip/GetSession',
+                        {
+                            login: this.login,
+                            password: this.password
+                        },
+                        {
+                            headers: {
+                                'Authorization': 'Basic 0JDQvdC00LjQtdCy0LDQmNCaOjQ0ODI1Nw==',
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
+                
+                    const session = sessionResponse.data.Pragma;
+                    
+                    localStorage.setItem('session', session);
+                    this.session = session;
+                    // log(session);
 
-        const authHeader = 'Basic 0JDQvdC00LjQtdCy0LDQmNCaOjQ0ODI1Nw==';
-        
-        const sessionResponse = await api.post('GetSession', {}, {
-          headers: { Authorization: authHeader }
-        });
+                    //Установка станции
+                    await axios.post(
+                        'http://localhost:8010/proxy/aextrip/SetUserMst',
+                        { 
+                            mst: "2252083363908310"
+                        },
+                        {
+                            headers: {
+                                'Pragma': session,
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
 
-        const dssession = sessionResponse.data?.sessionId; 
-        localStorage.setItem('dssession', dssession);
-
-        await api.post('SetUserMst', {
-          mst: "2252083363908310"
-        });
-
-        this.$router.push('/dashboard');
-
-      } catch (error) {
-        console.error('Ошибка авторизации:', error);
-        alert('Ошибка входа!');
-      }
+                    this.$router.push({ name: 'Expeditor' });
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert(`Ошибка авторизации: ${error.response?.data?.message || error.message}`);
+                }
+            },
+            logout() {
+                localStorage.removeItem('session');
+                localStorage.clear(); //очистить все ключи
+                this.$router.push({ name: 'Auth' });
+                alert('Вы вышли!!');
+            }
+        }
     }
-    }
-    };
 </script>
 
 <style scoped>
@@ -95,10 +128,12 @@ form{
 .btn {
     align-self: flex-start;
     margin-top: 10px;
+    margin-right: 5px;
     border: 1px solid #4D7CBF;
     color: #4D7CBF;
     padding: 5px 5px;
     background-color: none;
 }
+
 
 </style>

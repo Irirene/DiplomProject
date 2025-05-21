@@ -91,7 +91,7 @@ export default {
   z-index: 1000;
 }
 .modal {
-  background: #f1f1f1;
+  background: #f7f7f7;
   padding: 20px;
   border-radius: 10px;
   min-width: 500px;

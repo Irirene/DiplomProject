@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "proxy": "lcp --proxyUrl https://telegram-srv.jde.ru"
   },
   "dependencies": {
     "ag-grid-community": "^33.3.0",
     "ag-grid-vue3": "^33.3.0",
     "axios": "^1.9.0",
+    "local-cors-proxy": "^1.1.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
