@@ -7,7 +7,7 @@
                 class="task-list ag-theme-alpine"
                 :rowData="rowData"
                 :columnDefs="columnDefs"
-                rowSelection="multiple"             
+                rowSelection="single"             
             >
             </ag-grid-vue>
             
@@ -20,8 +20,10 @@
 <script>
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridVue } from "ag-grid-vue3";
-import { ref, onMounted } from 'vue';
 import "ag-grid-community/styles/ag-theme-alpine.css"
+
+import { ref, watch, onMounted } from 'vue';
+import axios from 'axios';
 
 import HistoryRequests from './HistoryRequests.vue';
 
@@ -33,14 +35,46 @@ export default {
     components: {
         AgGridVue, HistoryRequests
     },
-    setup() {
+
+    props: {
+        tripId: { type: String, required: true }
+    },
+
+    setup(props) {
         const columnDefs = ref([]);
         const rowData = ref([]);
-        
-        onMounted(async () => {
+
+        watch(() => props.tripId, async (newTripId) => {
+            if (!newTripId) return;
+            await GetRequests(newTripId);
+        }, { immediate: true });
+
+        async function GetRequests(tripId) {
             try {
-                const response = await fetch("/requests.json");
-                const data = await response.json();
+                const session = localStorage.getItem("session");
+                
+                const body = {
+                    "init": {
+                        "type": "table",
+                        "report": "at.aexTTNTrip.r"
+                    },
+                    "params": {
+                        "ID_AEX_TRIP": tripId
+                    }
+                };
+                
+                const response = await axios.post(
+                    "http://localhost:8010/proxy/aextrip/rt",
+                    body,
+                    {
+                        headers: {
+                            Pragma: `${session}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+                
+                const data = response.data;
                 if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
                     columnDefs.value = data.FieldsOut
                     .filter((field) => field.FIELD_VISIBLE === "1")
@@ -69,8 +103,8 @@ export default {
                 }
             } catch (error) {
                 console.error("Ошибка при загрузке данных:", error);
-            }
-        });
+            }        
+        }
         
         return {
             columnDefs,

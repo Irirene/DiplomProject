@@ -13,7 +13,8 @@
         class="task-list ag-theme-alpine"
         :rowData="filteredRowData"
         :columnDefs="columnDefs"
-        rowSelection="multiple"
+        rowSelection="single"
+        @rowClicked="onRowClicked"
       >
       </ag-grid-vue>
     </div>
@@ -23,8 +24,10 @@
 <script>
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridVue } from "ag-grid-vue3";
-import { ref, onMounted, computed } from "vue";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+
+import { ref, onMounted, computed } from "vue";
+import axios from "axios";
 
 import AddForm from "./UI/AddForm.vue";
 
@@ -36,14 +39,8 @@ export default {
   },
 
   props: {
-    taskNumberFilter: {
-      type: Object,
-      required: true,
-    },
-    deletedFilter: {
-      type: Object,
-      required: true,
-    },
+    taskNumberFilter: { type: Object, required: true, },
+    deletedFilter: { type: Object, required: true, },
   },
 
   setup(props) {
@@ -52,8 +49,34 @@ export default {
 
     onMounted(async () => {
       try {
-        const response = await fetch("/tasks.json");
-        const data = await response.json();
+        const session = localStorage.getItem("session");
+        
+        const body = {
+          init: {
+            type: "table",
+            report: "at.aexTripListKgDt.r"
+          },
+          params: {
+            dtBg: "31.03.2025",
+            dtEnd: "01.04.2025"
+          }
+        };
+
+        //запрос
+        const response = await axios.post(
+          "http://localhost:8010/proxy/aextrip/rt",
+          body,
+          {
+            headers: {
+              Pragma: `${session}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        // Структура ответа: ищите нужные поля!
+        const data = response.data;
+
         if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
           columnDefs.value = data.FieldsOut
             .filter((field) => field.FIELD_VISIBLE === "1")
@@ -109,6 +132,12 @@ export default {
       filteredRowData,
     };
   },
+
+  methods: {
+  onRowClicked(event) {
+    this.$emit('select-trip', event.data.ID_AEX_TRIP);
+  }
+}
 };
 </script>
 

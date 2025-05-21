@@ -9,12 +9,15 @@
     <div class="main-content">
       <Tasks class="task-grid" 
       :taskNumberFilter="taskNumberFilter"
-      :deletedFilter="deletedFilter"></Tasks>
+      :deletedFilter="deletedFilter"
+      @select-trip="selectedTripId = $event"
+      ></Tasks>
 
       <ButtonC class="btn-buttom" @click="toggleRequests">
         {{ showRequests ? 'Скрыть заявки' : 'Показать заявки' }}
       </ButtonC>
-      <Requests v-if="showRequests"></Requests>
+      <Requests :tripId="selectedTripId"
+      v-if="showRequests"></Requests>
     </div>
 
     <template v-if="showUnRequests">
@@ -59,6 +62,7 @@ export default {
     return {
       showRequests: false,
       showUnRequests: false,
+      selectedTripId: '',
 
       //фильтры
       taskNumberFilter: {
