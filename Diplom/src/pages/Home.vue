@@ -81,6 +81,9 @@ export default {
                         }
                     }
                 );
+
+                alert(`Авторизация прошла успешно!!`);
+
                 this.$router.push({ name: 'Expeditor' });
 
             } catch (error) {

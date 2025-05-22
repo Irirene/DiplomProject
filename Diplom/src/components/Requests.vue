@@ -11,9 +11,18 @@
             :columnDefs="columnDefs"
             rowSelection="single">
             </ag-grid-vue>
-
         </div>
-        <HistoryRequests class="history-list"></HistoryRequests>
+
+        <ButtonC 
+            class="btn-left" 
+            @click="toggleHistory">
+                {{ showHistory ? '>' : '<' }}
+        </ButtonC>
+        
+        <HistoryRequests 
+            v-if="showHistory" 
+            class="history-list">
+        </HistoryRequests>
     </div>
 
 </template>
@@ -23,16 +32,17 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridVue } from "ag-grid-vue3";
 import "ag-grid-community/styles/ag-theme-alpine.css"
 
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import axios from 'axios';
 
 import HistoryRequests from './HistoryRequests.vue';
+import ButtonC from './UI/ButtonC.vue'
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default {
     components: {
-        AgGridVue, HistoryRequests
+        AgGridVue, HistoryRequests, ButtonC,
     },
 
     props: {
@@ -42,6 +52,7 @@ export default {
     setup(props) {
         const columnDefs = ref([]);
         const rowData = ref([]);
+        const showHistory = ref(false);
 
         watch(() => props.taskId, async (newTaskId) => {
             if (!newTaskId) return;
@@ -105,9 +116,15 @@ export default {
             }
         }
 
+        function toggleHistory() {
+            showHistory.value = !showHistory.value;
+        }
+
         return {
             columnDefs,
             rowData,
+            showHistory,
+            toggleHistory,
         };
     },
 };
@@ -115,13 +132,23 @@ export default {
 
 <style scoped>
 #buttom-section {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+    width: 100%;
+    gap: 0;
 }
 
 .request-table {
-    /* width: 100; */
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.history-list {
+    flex: 1 1 150px;
+    min-width: 0;
     height: 100%;
 }
+
 </style>

@@ -215,8 +215,8 @@ button {
 }
 
 .task_buttons {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 30px;
   padding: 0;
   margin: 0;
   background-color: white;
