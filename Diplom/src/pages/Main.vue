@@ -3,46 +3,39 @@
 
     <Header class="header"></Header>
     <Filters class="filters"
-    @update-deleted-filter="onDeletedFilterUpdate" 
-    @update-task-number-filter="onTaskNumberFilterUpdate"></Filters>
+      @update-deleted-filter="onDeletedFilterUpdate"
+      @update-task-number-filter="onTaskNumberFilterUpdate">
+    </Filters>
 
     <div class="main-content">
-      <Tasks class="task-grid" 
-      :taskNumberFilter="taskNumberFilter"
-      :deletedFilter="deletedFilter"
-
-      @select-task="onSelectTask"
-      ></Tasks>
+      <Tasks class="task-grid"
+        :taskNumberFilter="taskNumberFilter"
+        :deletedFilter="deletedFilter"
+        @select-task="onSelectTask">
+      </Tasks>
 
       <ButtonC class="btn-buttom" @click="toggleRequests">
         {{ showRequests ? 'Скрыть заявки' : 'Показать заявки' }}
       </ButtonC>
-      <Requests v-if="showRequests"
-      :taskId="selectedTaskId"
-      ></Requests>
+      <Requests v-if="showRequests" :taskId="selectedTaskId"></Requests>
     </div>
 
     <template v-if="showUnRequests">
 
       <div class="toggle-unrequests">
         <ButtonC class="btn-left" @click="toggleUnRequests">
-          {{ showUnRequests ? '>' : '<' }}
-        </ButtonC>
+          {{ showUnRequests ? '>' : '<' }} </ButtonC>
       </div>
 
       <div class="left-section">
-        <UndistribRequests
-          :taskId="selectedTaskId"
-          :taskDate="selectedTaskDate"
-        ></UndistribRequests>
+        <UndistribRequests :taskId="selectedTaskId" :taskDate="selectedTaskDate"></UndistribRequests>
       </div>
     </template>
 
     <template v-else>
       <div class="toggle-unrequests">
         <ButtonC class="btn-left" @click="toggleUnRequests">
-          {{ showUnRequests ? '>' : '<' }}
-        </ButtonC>
+          {{ showUnRequests ? '>' : '<' }} </ButtonC>
       </div>
     </template>
   </div>
@@ -60,7 +53,7 @@ import Requests from '@/components/Requests.vue';
 import UndistribRequests from '@/components/UndistribRequests.vue';
 
 export default {
-  components:  {
+  components: {
     Header, Filters, Tasks, ButtonC, Requests, UndistribRequests,
   },
   data() {
@@ -94,7 +87,7 @@ export default {
     onTaskNumberFilterUpdate(filter) {
       this.taskNumberFilter = filter;
     },
-    
+
     onDeletedFilterUpdate(filter) {
       this.deletedFilter = filter;
     },
@@ -111,7 +104,6 @@ export default {
 
 
 <style scoped>
-
 .app-grid {
   display: grid;
   grid-template-areas:
@@ -164,9 +156,9 @@ export default {
   height: 100%;
   min-width: 0;
   min-height: 0;
-  overflow: auto; 
+  overflow: auto;
   margin: 0;
-  padding: 0;  
+  padding: 0;
 }
 
 .buttom-section {
@@ -183,8 +175,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;     
-  padding: 0;        
-  margin: 0;         
+  min-height: 0;
+  padding: 0;
+  margin: 0;
 }
 </style>

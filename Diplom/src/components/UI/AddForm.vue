@@ -83,13 +83,17 @@ export default {
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
+
 .modal {
   background: #f7f7f7;
   padding: 20px;
@@ -97,6 +101,7 @@ export default {
   min-width: 500px;
   min-height: 200px;
 }
+
 .modal-actions {
   display: flex;
   align-items: center;
@@ -104,39 +109,42 @@ export default {
   gap: 10px;
 }
 
-.modal-actions button{
-    font-size: 16px;
-    background-color: #F0F0F0;
-    border: 1px solid #4D7CBF;
-    border-radius: 5px;
-    min-height: 25px;
-    min-width: 100px;
+.modal-actions button {
+  font-size: 16px;
+  background-color: #F0F0F0;
+  border: 1px solid #4D7CBF;
+  border-radius: 5px;
+  min-height: 25px;
+  min-width: 100px;
 }
 
-input, select, textarea{
-    border: 1px solid #4D7CBF;
-    border-radius: 5px;
+input,
+select,
+textarea {
+  border: 1px solid #4D7CBF;
+  border-radius: 5px;
 }
 
-textarea{
-    width: 100%;
-    min-height: 50px;
+textarea {
+  width: 100%;
+  min-height: 50px;
 }
 
-label{
+label {
   margin-right: 10px;
   text-align: left;
   margin-right: 5px;
 }
 
 
-form > div {
+form>div {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
 }
 
-input, select {
+input,
+select {
   flex-grow: 1;
   max-width: 300px;
   border: 1px solid #4D7CBF;
@@ -144,6 +152,4 @@ input, select {
   padding: 2px;
   margin: 2px 0;
 }
-
-
 </style>

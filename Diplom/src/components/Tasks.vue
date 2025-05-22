@@ -1,21 +1,28 @@
 <template>
   <div class="tasks-outer">
     <div class="buttons">
+
       <AddForm></AddForm>
-      <button class="task_buttons"><img src="/src/images/edit.png" alt="" /></button>
-      <button class="task_buttons"><img src="/src/images/del.png" alt="" /></button>
+
+      <button class="task_buttons">
+        <img src="/src/images/edit.png" alt="" />
+      </button>
+
+      <button class="task_buttons">
+        <img src="/src/images/del.png" alt="" />
+      </button>
+
     </div>
 
     <h5>Список заданий экспедитору</h5>
 
     <div class="tasks-grid">
       <ag-grid-vue
-        class="task-list ag-theme-alpine"
-        :rowData="filteredRowData"
-        :columnDefs="columnDefs"
-        rowSelection="single"
-        @rowClicked="onRowClicked"
-      >
+      class="task-list ag-theme-alpine" 
+      :rowData="filteredRowData" 
+      :columnDefs="columnDefs"
+      rowSelection="single" 
+      @rowClicked="onRowClicked">
       </ag-grid-vue>
     </div>
   </div>
@@ -50,7 +57,7 @@ export default {
     onMounted(async () => {
       try {
         const session = localStorage.getItem("session");
-        
+
         const body = {
           init: {
             type: "table",
@@ -87,14 +94,14 @@ export default {
               filter: false,
               width: 160,
               suppressMovable: true,
-              cellStyle: { 
-                display: 'flex', 
+              cellStyle: {
+                display: 'flex',
                 // justifyContent: 'center',
                 alignItems: 'center',
                 // height: '100%',
                 backgroundColor: '#CFE1F4'
               },
-              headerStyle:{
+              headerStyle: {
                 backgroundColor: '#4D7CBF',
               },
             }));
@@ -106,7 +113,7 @@ export default {
         console.error("Ошибка при загрузке данных:", error);
       }
     });
-    
+
     const filteredRowData = computed(() => {
       let filtered = rowData.value;
 
@@ -123,7 +130,7 @@ export default {
       if (!props.deletedFilter.enabled || props.deletedFilter.value === "no") {
         filtered = filtered.filter((item) => item.AEX_TRIP_DEL == 0);
       }
-      
+
       return filtered;
     });
 
@@ -134,13 +141,13 @@ export default {
   },
 
   methods: {
-  onRowClicked(event) {
-    this.$emit('select-task', {
-      id: event.data.ID_AEX_TRIP,
-      date: event.data.AEX_TRIP_DT_BG
-    });
+    onRowClicked(event) {
+      this.$emit('select-task', {
+        id: event.data.ID_AEX_TRIP,
+        date: event.data.AEX_TRIP_DT_BG
+      });
+    }
   }
-}
 };
 </script>
 
@@ -154,27 +161,27 @@ export default {
   min-height: 0;
 }
 
-.tasks-grid{
+.tasks-grid {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
 }
 
-.task-list{
-    flex: 1 1 auto;
-    min-height: 0;
-    height: 100%;
+.task-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
 }
 
-h5{
-    color: #4D7CBF;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border: none;
-    box-sizing: border-box;
-    margin-left: 15px;    
+h5 {
+  color: #4D7CBF;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  border: none;
+  box-sizing: border-box;
+  margin-left: 15px;
 }
 
 /* img{
@@ -182,12 +189,12 @@ h5{
     display: flex;
 } */
 
-button{
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border: none;
-    background-color: white;
+button {
+  padding: 0;
+  margin: 0;
+  outline: none;
+  border: none;
+  background-color: white;
 }
 
 /* .ag-header{
@@ -207,7 +214,7 @@ button{
   margin: 0;
 }
 
-.task_buttons{
+.task_buttons {
   width: 20px;
   height: 20px;
   padding: 0;
@@ -223,5 +230,4 @@ button{
   max-height: 85%;
   object-fit: contain;
 }
-
 </style>

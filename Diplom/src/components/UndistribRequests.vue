@@ -1,11 +1,10 @@
 <template>
     <h5>Нераспределенные заявки</h5>
-    <ag-grid-vue
-        class="unrequests-list"
-        :rowData="rowData"
-        :columnDefs="columnDefs"
-        rowSelection="multiple"             
-    >
+    <ag-grid-vue 
+    class="unrequests-list" 
+    :rowData="rowData" 
+    :columnDefs="columnDefs" 
+    rowSelection="multiple">
     </ag-grid-vue>
 </template>
 
@@ -27,8 +26,8 @@ export default {
     },
 
     props: {
-    taskId: { type: String, default: null },
-    taskDate: { type: String, default: null }
+        taskId: { type: String, default: null },
+        taskDate: { type: String, default: null }
     },
 
     setup(props) {
@@ -44,7 +43,7 @@ export default {
         async function GetUnRequests(taskId, taskDate) {
             try {
                 const session = localStorage.getItem("session");
-                const dateWithTime = props.tripDate;
+                const dateWithTime = props.taskDate;
                 const onlyDate = dateWithTime ? dateWithTime.split(' ')[0] : '';
 
                 const body = {
@@ -57,7 +56,7 @@ export default {
                         "ID_AEX_TRIP": taskId
                     }
                 };
-                
+
                 const response = await axios.post(
                     "http://localhost:8010/proxy/aextrip/rt",
                     body,
@@ -68,55 +67,50 @@ export default {
                         }
                     }
                 );
-                
+
                 const data = response.data;
                 if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
                     columnDefs.value = data.FieldsOut
-                    .filter((field) => field.FIELD_VISIBLE === "1")
-                    .map((field) => ({
-                        headerName: field.FIELD_NAME,
-                        field: field.FIELD_CODE,
-                        //встроенная фильтрация и сортировка
-                        sortable: false,
-                        filter: false,
-                        width: 150,
-                        suppressMovable: true,
-                        cellStyle: { 
-                            display: 'flex', 
-                            // justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '100%',
-                            backgroundColor: '#FFF9EF',
-                        },
-                        headerStyle:{
-                            backgroundColor: '#4D7CBF',
-                        },
-                    }));
+                        .filter((field) => field.FIELD_VISIBLE === "1")
+                        .map((field) => ({
+                            headerName: field.FIELD_NAME,
+                            field: field.FIELD_CODE,
+                            //встроенная фильтрация и сортировка
+                            sortable: false,
+                            filter: false,
+                            width: 150,
+                            suppressMovable: true,
+                            cellStyle: {
+                                display: 'flex',
+                                // justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100%',
+                                backgroundColor: '#FFF9EF',
+                            },
+                            headerStyle: {
+                                backgroundColor: '#4D7CBF',
+                            },
+                        }));
                 }
                 if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
                     rowData.value = data.ALL_DATA.result;
                 }
             } catch (error) {
                 console.error("Ошибка при загрузке данных:", error);
-            }        
+            }
         }
 
         return {
             columnDefs,
             rowData,
-        };},
+        };
+    },
 };
 </script>
 
 <style scoped>
 
-/* .ag-cell{
-    background-color: #FFF9EF;
-} */
-
-.unrequests-list{
-    /* width: 100; */
+.unrequests-list {
     height: 100%;
 }
-
 </style>

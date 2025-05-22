@@ -8,6 +8,5 @@ import router from './router/router'
 //             .mount('#app')
 
 const app = createApp(App);
-app.config.performance = true;
 app.use(router).mount('#app');
 

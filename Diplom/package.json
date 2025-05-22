@@ -10,11 +10,13 @@
     "proxy": "lcp --proxyUrl https://telegram-srv.jde.ru"
   },
   "dependencies": {
+    "@kyvg/vue3-notification": "^3.4.1",
     "ag-grid-community": "^33.3.0",
     "ag-grid-vue3": "^33.3.0",
     "axios": "^1.9.0",
     "local-cors-proxy": "^1.1.0",
     "vue": "^3.5.13",
+    "vue-msgbox": "^0.2.14",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
