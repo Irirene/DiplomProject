@@ -50,6 +50,8 @@ export default {
     deletedFilter: { type: Object, required: true, },
   },
 
+   emits: ['select-task'],
+
   setup(props) {
     const columnDefs = ref([]);
     const rowData = ref([]);
