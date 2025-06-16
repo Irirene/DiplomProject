@@ -52,16 +52,19 @@
 </template>
 
 <script>
+import axios from 'axios';
+
+
 export default {
   data() {
     return {
       isOpen: false,
-      cars: ['197У809ВМ', '222В333КК'],
+      cars: [],
       drivers: ['Пужалин Александр Николаевич', 'Иванов Иван Иванович'],
       forwarders: ['Пужалин Александр Николаевич', 'Петров Петр Петрович'],
       stations: ['Новосибирск-Ногина', 'Москва-Киевская'],
       form: {
-        auto: '197У809ВМ',
+        auto: '',
         driver: 'Пужалин Александр Николаевич',
         forwarder: 'Пужалин Александр Николаевич',
         departure: '',
@@ -71,7 +74,54 @@ export default {
       }
     };
   },
+  watch:{
+    isOpen(newVal){
+      if (newVal) this.fetchCars();
+    }
+  },
   methods: {
+    async fetchCars() {
+      try {
+        const session = localStorage.getItem('session');
+        if (!session) {
+          alert('Нет сессии! Авторизуйтесь заново.');
+          return;
+        }
+
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListTrs.r"
+            },
+            params: {
+              ID_TRS: "0",
+              TRS_PR: "100"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        if (response.data?.ALL_DATA?.result) {
+          this.cars = response.data.ALL_DATA.result
+            .map(item => item.TRS_SID)
+            .filter(Boolean);
+          
+          if (this.cars.length > 0) {
+            this.form.auto = this.cars[0];
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке автомобилей:', error);
+        alert('Не удалось загрузить список авто');
+      }
+    },
     submitForm() {
       console.log(this.form);
       this.isOpen = false;
