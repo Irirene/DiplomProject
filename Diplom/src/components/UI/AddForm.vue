@@ -60,13 +60,13 @@ export default {
     return {
       isOpen: false,
       cars: [],
-      drivers: ['Пужалин Александр Николаевич', 'Иванов Иван Иванович'],
-      forwarders: ['Пужалин Александр Николаевич', 'Петров Петр Петрович'],
+      drivers: [],
+      forwarders: [],
       stations: ['Новосибирск-Ногина', 'Москва-Киевская'],
       form: {
         auto: '',
-        driver: 'Пужалин Александр Николаевич',
-        forwarder: 'Пужалин Александр Николаевич',
+        driver: '',
+        forwarder: '',
         departure: '',
         arrival: '',
         station: 'Новосибирск-Ногина',
@@ -76,18 +76,16 @@ export default {
   },
   watch:{
     isOpen(newVal){
-      if (newVal) this.fetchCars();
+      if (newVal) { 
+        this.fetchCars();
+        this.fetchDriversAndForwarders();
+      }
     }
   },
   methods: {
     async fetchCars() {
       try {
         const session = localStorage.getItem('session');
-        if (!session) {
-          alert('Нет сессии! Авторизуйтесь заново.');
-          return;
-        }
-
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
           {
@@ -112,16 +110,56 @@ export default {
           this.cars = response.data.ALL_DATA.result
             .map(item => item.TRS_SID)
             .filter(Boolean);
-          
-          if (this.cars.length > 0) {
-            this.form.auto = this.cars[0];
-          }
         }
       } catch (error) {
         console.error('Ошибка при загрузке автомобилей:', error);
         alert('Не удалось загрузить список авто');
       }
     },
+
+
+    async fetchDriversAndForwarders() {
+      try {
+        const session = localStorage.getItem('session');
+
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListDriver.r"
+            },
+            params: {
+              ID_SOTR1: "0",
+              ID_KG: "1",
+              PR_DRV: "1"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        const data = response.data.ALL_DATA.result;
+
+        this.drivers = data
+        .map(item => item.VSOTR_FULLNAME)
+        .filter(Boolean);
+        
+        this.forwarders = data
+        .map(item => item.VSOTR_FULLNAME)
+        .filter(Boolean);
+
+      } catch (error) {
+        console.error('Ошибка при загрузке водителей:', error);
+        alert('Не удалось загрузить список водителей');
+      }
+    },
+
+
     submitForm() {
       console.log(this.form);
       this.isOpen = false;
