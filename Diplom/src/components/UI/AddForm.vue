@@ -102,6 +102,8 @@ export default {
       }
     }
   },
+
+  
   methods: {
     async fetchCars() {
       try {
@@ -273,6 +275,18 @@ export default {
       }
     },
 
+    formatCustomDate(dateTimeString) {
+      const dateObj = new Date(dateTimeString);
+
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    },
+    
 
     async submitForm() {
       try {
@@ -281,6 +295,9 @@ export default {
         // Город по выбранной станции
         const selectedStation = this.stations.find(st => st.id === this.form.station);
         const cityId = selectedStation ? selectedStation.cityId : null;
+
+        const formattedDeparture = this.formatCustomDate(this.form.departure);
+        const formattedArrival = this.formatCustomDate(this.form.arrival);
 
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
@@ -296,8 +313,8 @@ export default {
               "AEX_TRIP_ID_MST": this.form.station,           // Станция начала
               "AEX_TRIP_ID_SOTR1": this.form.driver,          // Водитель
               "AEX_TRIP_ID_EXP": this.form.forwarder,         // Экспедитор
-              "AEX_TRIP_DT_BG": this.form.departure,          // Дата и время начала
-              "AEX_TRIP_DT_END": this.form.arrival,           // Дата и время конца
+              "AEX_TRIP_DT_BG": formattedDeparture,          // Дата и время начала
+              "AEX_TRIP_DT_END": formattedArrival,           // Дата и время конца
               "AEX_TRIP_VID": 0,                              // Всегда 0
               "AEX_TRIP_ID_MST_FINISH": this.form.station,    // Станция завершения
               "AEX_TRIP_ID_TRS_PRIC": this.form.trailer,      // Прицеп
@@ -320,7 +337,9 @@ export default {
         console.error('Ошибка при добавлении задания:', error);
         alert('Ошибка при добавлении задания');
       }
-    }   
+    },
+    
+    
     
   }
 };
