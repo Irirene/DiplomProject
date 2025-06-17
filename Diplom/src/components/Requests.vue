@@ -59,9 +59,20 @@ export default {
             await GetRequests(newTaskId);
         }, { immediate: true });
 
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i=0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+            }
+            return null;
+        }
+
         async function GetRequests(taskId) {
             try {
-                const session = localStorage.getItem("session");
+                const session = getCookie('session');
 
                 const body = {
                     "init": {

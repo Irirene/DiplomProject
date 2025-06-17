@@ -4,9 +4,7 @@
 
       <AddForm></AddForm>
 
-      <button class="task_buttons">
-        <img src="/src/images/edit.png" alt="" />
-      </button>
+      <EditForm></EditForm>
 
       <button class="task_buttons">
         <img src="/src/images/del.png" alt="" />
@@ -37,12 +35,13 @@ import { watch, ref, onMounted, computed } from "vue";
 import axios from "axios";
 
 import AddForm from "./UI/AddForm.vue";
+import EditForm from "./UI/EditForm.vue";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default {
   components: {
-    AgGridVue, AddForm,
+    AgGridVue, AddForm, EditForm
   },
 
   props: {
@@ -58,6 +57,17 @@ export default {
     const columnDefs = ref([]);
     const rowData = ref([]);
 
+    function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+      }
+      return null;
+    }
+
     function formatDate(dateStr) {
       if (!dateStr) return '';
       const [year, month, day] = dateStr.split('-');
@@ -66,7 +76,7 @@ export default {
 
     async function loadData() {
       try {
-        const session = localStorage.getItem("session");
+        const session = getCookie('session');
 
         const body = {
           init: {

@@ -2,7 +2,7 @@
 
     <div class="button">
 
-      <button class="req_buttons" @click="onButtonClick">
+      <button class="req_buttons" @click="onButtonClick" title="Распределить заявку">
         <img src="/src/images/rasp.png" alt="" />
       </button>
 
@@ -11,7 +11,6 @@
 
     <h5>Нераспределенные заявки</h5>
     <ag-grid-vue
-    ref="agGrid" 
     class="unrequests-list" 
     :rowData="rowData" 
     :columnDefs="columnDefs" 
@@ -32,7 +31,6 @@ import axios from 'axios';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 
-
 export default {
     components: {
         AgGridVue,
@@ -42,11 +40,23 @@ export default {
         taskId: { type: String, default: null },
         taskDate: { type: String, default: null }
     },
+    
 
     setup(props) {
         const columnDefs = ref([]);
         const rowData = ref([]);
         const selectedRow = ref(null);
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i=0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+            }
+            return null;
+        }
 
         watch(() => [props.taskId, props.taskDate], async ([newTaskId, newTaskDate]) => {
             if (!newTaskId || !newTaskDate) return;
@@ -55,7 +65,7 @@ export default {
 
         async function GetUnRequests(taskId, taskDate) {
             try {
-                const session = localStorage.getItem("session");
+                const session = getCookie('session');
                 const onlyDate = taskDate ? taskDate.split(' ')[0] : '';
 
                 const body = {
@@ -134,7 +144,7 @@ export default {
             };
             
             try {
-                const session = localStorage.getItem("session");
+                const session = getCookie('session');
                 await axios.post(
                     "http://localhost:8010/proxy/aextrip/rt",
                     body,

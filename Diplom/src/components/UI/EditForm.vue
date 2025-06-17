@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="isOpen = true" class="task_buttons"><img src="/src/images/add.png" alt=""></button>
+    <button @click="isOpen = true" class="task_buttons"><img src="/src/images/edit.png" alt=""></button>
     <div v-if="isOpen" class="modal-overlay" @click.self="isOpen = false">
       <div class="modal">
         <h2>Задание экспедитору</h2>
@@ -103,24 +103,11 @@ export default {
     }
   },
 
-    
+  
   methods: {
-
-    getCookie(name) {
-      const nameEQ = name + "=";
-      const ca = document.cookie.split(';');
-      for(let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1);
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
-      }
-      return null;
-    },
-   
     async fetchCars() {
       try {
-        const session = this.getCookie('session');
-
+        const session = localStorage.getItem('session');
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
           {
@@ -160,8 +147,7 @@ export default {
 
     async fetchTrailers() {
       try {
-        const session = this.getCookie('session');
-
+        const session = localStorage.getItem('session');
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
           {
@@ -200,7 +186,7 @@ export default {
 
     async fetchDriversAndForwarders() {
       try {
-        const session = this.getCookie('session');
+        const session = localStorage.getItem('session');
 
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
@@ -252,7 +238,7 @@ export default {
 
     async fetchStations() {
       try {
-        const session = this.getCookie('session');
+        const session = localStorage.getItem('session');
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
           {
@@ -299,12 +285,12 @@ export default {
       const minutes = String(dateObj.getMinutes()).padStart(2, '0');
       
       return `${day}.${month}.${year} ${hours}:${minutes}`;
-    }, 
+    },
     
 
     async submitForm() {
       try {
-        const session = this.getCookie('session');
+        const session = localStorage.getItem('session');
         
         // Город по выбранной станции
         const selectedStation = this.stations.find(st => st.id === this.form.station);
@@ -357,8 +343,9 @@ export default {
     
   }
 };
-</script>
 
+
+</script>
 
 <style scoped>
 .modal-overlay {

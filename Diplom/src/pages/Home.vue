@@ -45,6 +45,29 @@ export default {
     },
 
     methods: {
+
+        setCookie(name, value, seconds) {
+            let expires = "";
+            if (seconds) {
+                const date = new Date();
+                date.setTime(date.getTime() + (seconds * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/; Secure; SameSite=Strict";
+        },
+
+        // getCookie(name) {
+        //     const nameEQ = name + "=";
+        //     const ca = document.cookie.split(';');
+        //     for(let i=0;i < ca.length;i++) {
+        //         let c = ca[i];
+        //         while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        //         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        //     }
+        //     return null;
+        // },
+
+
         async reg() {
             try {
 
@@ -65,8 +88,7 @@ export default {
 
                 const session = sessionResponse.data.Pragma;
 
-                localStorage.setItem('session', session);
-                this.session = session;
+                this.setCookie('session', session, 3600);
 
                 //Установка станции
                 await axios.post(
@@ -93,8 +115,7 @@ export default {
         },
 
         logout() {
-            localStorage.removeItem('session');
-            localStorage.clear(); //очистить все ключи
+            this.setCookie('session', '', -1); //очистить все ключи
             this.$router.push({ name: 'Auth' });
             alert('Вы вышли!!');
         }
