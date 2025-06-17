@@ -66,7 +66,7 @@ export default {
       selectedTaskId: '',
       selectedTaskDate: '',
 
-      //фильтры
+      
       taskNumberFilter: {
         enabled: false,
         input: ''

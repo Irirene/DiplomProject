@@ -76,7 +76,7 @@ export default {
                             headerName: field.FIELD_NAME,
                             field: field.FIELD_CODE,
                             //встроенная фильтрация и сортировка
-                            sortable: false,
+                            sortable: true,
                             filter: false,
                             width: 150,
                             suppressMovable: true,

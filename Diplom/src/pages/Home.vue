@@ -39,8 +39,8 @@ export default {
 
     data() {
         return {
-            login: '', //АндиеваИК
-            password: '' //448257
+            login: '',
+            password: ''
         }
     },
 
