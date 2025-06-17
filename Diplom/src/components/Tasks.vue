@@ -77,7 +77,10 @@ export default {
             ...(props.dateFilter.enabled && {
               dtBg: formatDate(props.dateFilter.from),
               dtEnd: formatDate(props.dateFilter.to)
-            })
+            }),
+            isDel: "0",
+            trsSid: "",
+            idAexTrip: "0",
           }
         };
 
@@ -202,11 +205,6 @@ h5 {
   margin-left: 15px;
 }
 
-/* img{
-    width: 5%;
-    display: flex;
-} */
-
 button {
   padding: 0;
   margin: 0;
@@ -215,13 +213,6 @@ button {
   background-color: white;
 }
 
-/* .ag-header{
-    background-color: #4D7CBF;    
-} */
-
-/* .task-grid{
-    display: flex;
-} */
 
 .buttons {
   display: flex;

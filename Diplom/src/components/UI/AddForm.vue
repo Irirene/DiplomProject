@@ -8,19 +8,33 @@
           <div>
             <label>Авто:</label>
             <select v-model="form.auto">
-              <option v-for="car in cars" :key="car" :value="car">{{ car }}</option>
+              <option v-for="car in cars" 
+              :key="car.id" 
+              :value="car.id"> {{ car.name }} </option>
+            </select>
+          </div>
+          <div>
+            <label>Прицеп:</label>
+            <select v-model="form.trailer">
+              <option v-for="trailer in trailers" 
+              :key="trailer.id" 
+              :value="trailer.id"> {{ trailer.name }} </option>
             </select>
           </div>
           <div>
             <label>Водитель:</label>
             <select v-model="form.driver">
-              <option v-for="driver in drivers" :key="driver" :value="driver">{{ driver }}</option>
+              <option v-for="driver in drivers" 
+              :key="driver.id" 
+              :value="driver.id"> {{ driver.name }} </option>
             </select>
           </div>
           <div>
             <label>Экспедитор:</label>
             <select v-model="form.forwarder">
-              <option v-for="forwarder in forwarders" :key="forwarder" :value="forwarder">{{ forwarder }}</option>
+              <option v-for="forwarder in forwarders" 
+              :key="forwarder.id" 
+              :value="forwarder.id"> {{ forwarder.name }} </option>
             </select>
           </div>
           <div>
@@ -34,7 +48,9 @@
           <div>
             <label>Станция:</label>
             <select v-model="form.station">
-              <option v-for="station in stations" :key="station" :value="station">{{ station }}</option>
+              <option v-for="station in stations" 
+              :key="station.id" 
+              :value="station.id"> {{ station.name }} </option>
             </select>
           </div>
           <div>
@@ -60,16 +76,18 @@ export default {
     return {
       isOpen: false,
       cars: [],
+      trailers: [],
       drivers: [],
       forwarders: [],
-      stations: ['Новосибирск-Ногина', 'Москва-Киевская'],
+      stations: [],
       form: {
         auto: '',
+        trailer: '',
         driver: '',
         forwarder: '',
         departure: '',
         arrival: '',
-        station: 'Новосибирск-Ногина',
+        station: '',
         note: ''
       }
     };
@@ -78,7 +96,9 @@ export default {
     isOpen(newVal){
       if (newVal) { 
         this.fetchCars();
+        this.fetchTrailers()
         this.fetchDriversAndForwarders();
+        this.fetchStations();
       }
     }
   },
@@ -108,15 +128,59 @@ export default {
         
         if (response.data?.ALL_DATA?.result) {
           this.cars = response.data.ALL_DATA.result
-            .map(item => item.TRS_SID)
-            .filter(Boolean);
+            .filter(item => item.ID_TRS && item.TRS_SID)
+            .map(item => ({
+              id: item.ID_TRS,
+              name: item.TRS_SID
+            }));
+            this.form.auto = this.cars.length ? this.cars[0].id : '';
         }
+
       } catch (error) {
         console.error('Ошибка при загрузке автомобилей:', error);
         alert('Не удалось загрузить список авто');
       }
     },
 
+
+    async fetchTrailers() {
+      try {
+        const session = localStorage.getItem('session');
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListTrs.r"
+            },
+            params: {
+              ID_TRS: "0",
+              TRS_PR: "12"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        if (response.data?.ALL_DATA?.result) {
+          this.trailers = response.data.ALL_DATA.result
+            .filter(item => item.ID_TRS && item.TRS_SID)
+            .map(item => ({
+              id: item.ID_TRS,
+              name: item.TRS_SID
+            }));
+            this.form.trailer = this.trailers.length ? this.trailers[0].id : '';
+        }
+
+      } catch (error) {
+        console.error('Ошибка при загрузке прицепов:', error);
+        alert('Не удалось загрузить список прицепов');
+      }
+    },
 
     async fetchDriversAndForwarders() {
       try {
@@ -140,18 +204,29 @@ export default {
               Pragma: session,
               "Content-Type": "application/json"
             }
-          }
-        );
+          },
+
+        );        
         
         const data = response.data.ALL_DATA.result;
 
         this.drivers = data
-        .map(item => item.VSOTR_FULLNAME)
-        .filter(Boolean);
+        .filter(item => item.VID_SOTR && item.VSOTR_FULLNAME)
+        .map(item => ({
+          id: item.VID_SOTR,
+          name: item.VSOTR_FULLNAME
+        }));
+
+        this.form.driver = this.drivers.length ? this.drivers[0].id : '';
         
         this.forwarders = data
-        .map(item => item.VSOTR_FULLNAME)
-        .filter(Boolean);
+        .filter(item => item.VID_SOTR && item.VSOTR_FULLNAME)
+        .map(item => ({
+          id: item.VID_SOTR,
+          name: item.VSOTR_FULLNAME
+        }));
+
+        this.form.forwarder = this.forwarders.length ? this.forwarders[0].id : '';
 
       } catch (error) {
         console.error('Ошибка при загрузке водителей:', error);
@@ -159,13 +234,98 @@ export default {
       }
     },
 
+    async fetchStations() {
+      try {
+        const session = localStorage.getItem('session');
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListMstAexTrip.r"
+            },
+            params: {
+              "ID_MST": "0"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        if (response.data?.ALL_DATA?.result) {
+          this.stations = response.data.ALL_DATA.result
+            .filter(item => item.ID_MST && item.MST_NAME)
+            .map(item => ({
+              id: item.ID_MST,
+              name: item.MST_NAME,
+              cityId: item.MST_ID_KG
+            }));
 
-    submitForm() {
-      console.log(this.form);
-      this.isOpen = false;
-    }
+            this.form.station = this.stations.length ? this.stations[0].id : '';
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке станций:', error);
+        alert('Не удалось загрузить список станций');
+      }
+    },
+
+
+    async submitForm() {
+      try {
+        const session = localStorage.getItem('session');
+        
+        // Город по выбранной станции
+        const selectedStation = this.stations.find(st => st.id === this.form.station);
+        const cityId = selectedStation ? selectedStation.cityId : null;
+
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "data",
+              report: "at.setInsUpdAexTrip.w"
+            },
+            params: {
+              // ID_AEX_TRIP: "",
+              "AEX_TRIP_ID_TRS": this.form.auto,             // ТС
+              "AEX_TRIP_ID_KG": cityId,                       // Город станции
+              "AEX_TRIP_ID_MST": this.form.station,           // Станция начала
+              "AEX_TRIP_ID_SOTR1": this.form.driver,          // Водитель
+              "AEX_TRIP_ID_EXP": this.form.forwarder,         // Экспедитор
+              "AEX_TRIP_DT_BG": this.form.departure,          // Дата и время начала
+              "AEX_TRIP_DT_END": this.form.arrival,           // Дата и время конца
+              "AEX_TRIP_VID": 0,                              // Всегда 0
+              "AEX_TRIP_ID_MST_FINISH": this.form.station,    // Станция завершения
+              "AEX_TRIP_ID_TRS_PRIC": this.form.trailer,      // Прицеп
+              "AEX_TRIP_TXT": this.form.note                  // Примечание
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        console.log('Ответ сервера:', response.data);
+        alert('Задание успешно добавлено!');
+        this.isOpen = false;
+      
+      } catch (error) {
+        console.error('Ошибка при добавлении задания:', error);
+        alert('Ошибка при добавлении задания');
+      }
+    }   
+    
   }
 };
+
+
 </script>
 
 <style scoped>
