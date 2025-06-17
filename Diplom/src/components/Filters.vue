@@ -208,6 +208,16 @@
 <script>
 export default {
   data() {
+
+    const today = new Date();
+    const monthAgo = new Date(today);
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    
+    const format = (date) => date.toISOString().slice(0, 10);
+
+
+
+
     return {
       searches: ['...abc', '...abc...', 'abc'],
 
@@ -218,8 +228,8 @@ export default {
 
       dateFilter: {
         enabled: false,
-        from: '',
-        to: ''
+        from: format(monthAgo),
+        to: format(today)
       },
 
       townFilter: {
@@ -275,6 +285,16 @@ export default {
       },
     }
   },
+  
+  watch: {
+    dateFilter: {
+      handler(newVal) {
+        this.$emit('update-date-filter', {...newVal});
+      },
+      deep: true
+    }
+  },
+
   methods: {
 
     emitTaskNumberFilter() {

@@ -4,13 +4,16 @@
     <Header class="header"></Header>
     <Filters class="filters"
       @update-deleted-filter="onDeletedFilterUpdate"
-      @update-task-number-filter="onTaskNumberFilterUpdate">
+      @update-task-number-filter="onTaskNumberFilterUpdate"
+      @update-date-filter="onDateFilterUpdate">
+      
     </Filters>
 
     <div class="main-content">
       <Tasks class="task-grid"
         :taskNumberFilter="taskNumberFilter"
         :deletedFilter="deletedFilter"
+        :dateFilter="dateFilter"
         @select-task="onSelectTask">
       </Tasks>
 
@@ -73,6 +76,12 @@ export default {
         enabled: false,
         value: 'no',
       },
+
+      dateFilter:{
+        enabled: false,
+        from: '',
+        to: ''
+      },
     };
   },
   methods: {
@@ -95,6 +104,10 @@ export default {
     onSelectTask(task) {
       this.selectedTaskId = task.id;
       this.selectedTaskDate = task.date;
+    },
+
+    onDateFilterUpdate(filter){
+      this.dateFilter = filter
     },
 
 

@@ -33,7 +33,7 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridVue } from "ag-grid-vue3";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import { ref, onMounted, computed } from "vue";
+import { watch, ref, onMounted, computed } from "vue";
 import axios from "axios";
 
 import AddForm from "./UI/AddForm.vue";
@@ -48,15 +48,23 @@ export default {
   props: {
     taskNumberFilter: { type: Object, required: true, },
     deletedFilter: { type: Object, required: true, },
+    dateFilter: { type: Object, required: true },
   },
+  
+  emits: ['select-task'],
 
-   emits: ['select-task'],
 
   setup(props) {
     const columnDefs = ref([]);
     const rowData = ref([]);
 
-    onMounted(async () => {
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}.${month}.${year}`;
+    }
+
+    async function loadData() {
       try {
         const session = localStorage.getItem("session");
 
@@ -66,8 +74,10 @@ export default {
             report: "at.aexTripListKgDt.r"
           },
           params: {
-            dtBg: "31.03.2025",
-            dtEnd: "01.04.2025"
+            ...(props.dateFilter.enabled && {
+              dtBg: formatDate(props.dateFilter.from),
+              dtEnd: formatDate(props.dateFilter.to)
+            })
           }
         };
 
@@ -83,7 +93,7 @@ export default {
           }
         );
 
-        // Структура ответа: ищите нужные поля!
+        
         const data = response.data;
 
         if (data.FieldsOut && Array.isArray(data.FieldsOut)) {
@@ -92,15 +102,13 @@ export default {
             .map((field) => ({
               headerName: field.FIELD_NAME,
               field: field.FIELD_CODE,
-              sortable: false,
+              sortable: true,
               filter: false,
               width: 160,
               suppressMovable: true,
               cellStyle: {
                 display: 'flex',
-                // justifyContent: 'center',
                 alignItems: 'center',
-                // height: '100%',
                 backgroundColor: '#CFE1F4'
               },
               headerStyle: {
@@ -110,11 +118,17 @@ export default {
         }
         if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
           rowData.value = data.ALL_DATA.result;
+        } else {
+          rowData.value = [];
         }
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
-    });
+    };
+
+    onMounted(loadData);
+
+    watch(() => props.dateFilter, loadData, { deep: true });
 
     const filteredRowData = computed(() => {
       let filtered = rowData.value;
@@ -135,6 +149,8 @@ export default {
 
       return filtered;
     });
+
+    
 
     return {
       columnDefs,
