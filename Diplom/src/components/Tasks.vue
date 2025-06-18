@@ -4,7 +4,7 @@
 
       <AddForm></AddForm>
 
-      <EditForm></EditForm>
+      <EditForm :idTrs="selectedTrsId"> </EditForm>
 
       <button class="task_buttons">
         <img src="/src/images/del.png" alt="" />
@@ -17,9 +17,9 @@
     <div class="tasks-grid">
       <ag-grid-vue
       class="task-list ag-theme-alpine" 
-      :rowData="filteredRowData" 
+      :rowData="rowData" 
       :columnDefs="columnDefs"
-      rowSelection="single" 
+      :rowSelection="{ mode: 'singleRow' }" 
       @rowClicked="onRowClicked">
       </ag-grid-vue>
     </div>
@@ -48,6 +48,7 @@ export default {
     taskNumberFilter: { type: Object, required: true, },
     deletedFilter: { type: Object, required: true, },
     dateFilter: { type: Object, required: true },
+    numberFilter: { type: Object, required: true },
   },
   
   emits: ['select-task'],
@@ -56,6 +57,8 @@ export default {
   setup(props) {
     const columnDefs = ref([]);
     const rowData = ref([]);
+
+    const selectedTrsId = ref(null);
 
     function getCookie(name) {
       const nameEQ = name + "=";
@@ -84,13 +87,16 @@ export default {
             report: "at.aexTripListKgDt.r"
           },
           params: {
-            ...(props.dateFilter.enabled && {
-              dtBg: formatDate(props.dateFilter.from),
-              dtEnd: formatDate(props.dateFilter.to)
-            }),
-            isDel: "0",
-            trsSid: "",
-            idAexTrip: "0",
+            dtBg: formatDate(props.dateFilter.from),
+            dtEnd: formatDate(props.dateFilter.to),
+
+            isDel: props.deletedFilter.enabled ? 
+            (props.deletedFilter.value === "yes" ? 1 : 0) : -1,
+            
+            trsSid: props.numberFilter.enabled ? (props.numberFilter.input || "") : "",
+
+            idAexTrip: props.taskNumberFilter.enabled && props.taskNumberFilter.input
+            ? props.taskNumberFilter.input : 0,
           }
         };
 
@@ -141,41 +147,48 @@ export default {
 
     onMounted(loadData);
 
-    watch(() => props.dateFilter, loadData, { deep: true });
+    watch(
+      [() => props.dateFilter, () => props.taskNumberFilter, () => props.deletedFilter, () => props.numberFilter],
+      loadData,
+      { deep: true }
+    );
 
-    const filteredRowData = computed(() => {
-      let filtered = rowData.value;
+    // const filteredRowData = computed(() => {
+    //   let filtered = rowData.value;
 
-      // Фильтр № задания
-      if (props.taskNumberFilter.enabled && props.taskNumberFilter.input) {
-        const filterValue = props.taskNumberFilter.input.toLowerCase();
-        filtered = filtered.filter((item) => {
-          const fieldValue = item.ID_AEX_TRIP ? String(item.ID_AEX_TRIP).toLowerCase() : "";
-          return fieldValue.includes(filterValue);
-        });
-      }
+    //   // Фильтр № задания
+    //   if (props.taskNumberFilter.enabled && props.taskNumberFilter.input) {
+    //     const filterValue = props.taskNumberFilter.input.toLowerCase();
+    //     filtered = filtered.filter((item) => {
+    //       const fieldValue = item.ID_AEX_TRIP ? String(item.ID_AEX_TRIP).toLowerCase() : "";
+    //       return fieldValue.includes(filterValue);
+    //     });
+    //   }
 
-      // Фильтр "Удалённые"
-      if (!props.deletedFilter.enabled || props.deletedFilter.value === "no") {
-        filtered = filtered.filter((item) => item.AEX_TRIP_DEL == 0);
-      }
+    //   // Фильтр "Удалённые"
+    //   if (!props.deletedFilter.enabled || props.deletedFilter.value === "no") {
+    //     filtered = filtered.filter((item) => item.AEX_TRIP_DEL == 0);
+    //   }
 
-      return filtered;
-    });
+    //   return filtered;
+    // });
 
     
 
     return {
       columnDefs,
-      filteredRowData,
+      rowData,
+      selectedTrsId,
     };
   },
 
   methods: {
     onRowClicked(event) {
+      this.selectedTrsId = event.data.AEX_TRIP_ID_TRS;
+
       this.$emit('select-task', {
         id: event.data.ID_AEX_TRIP,
-        date: event.data.AEX_TRIP_DT_BG
+        date: event.data.AEX_TRIP_DT_BG,
       });
     }
   }

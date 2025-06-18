@@ -58,7 +58,7 @@
             <textarea v-model="form.note"></textarea>
           </div>
           <div class="modal-actions">
-            <button type="submit">Добавить</button>
+            <button type="submit">Изменить</button>
             <button type="button" @click="isOpen = false">Отмена</button>
           </div>
         </form>
@@ -92,22 +92,42 @@ export default {
       }
     };
   },
+
+  props: { 
+    task: { type: Object, default: null },
+    idTrs: { type: [String, Number], default: null }
+  },
+
   watch:{
-    isOpen(newVal){
-      if (newVal) { 
-        this.fetchCars();
-        this.fetchTrailers()
-        this.fetchDriversAndForwarders();
-        this.fetchStations();
+    isOpen(newVal) {
+      if (newVal) {
+        this.fetchCars(this.idTrs);
+      }
+    },
+    idTrs(newVal) {
+      if (this.isOpen && newVal) {
+        this.fetchCars(newVal);
       }
     }
   },
 
   
   methods: {
-    async fetchCars() {
+
+    getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+      }
+      return null;
+    },
+
+    async fetchCars(idTrs) {
       try {
-        const session = localStorage.getItem('session');
+        const session = this.getCookie('session');
         const response = await axios.post(
           'http://localhost:8010/proxy/aextrip/rt',
           {
@@ -116,7 +136,7 @@ export default {
               report: "at.getListTrs.r"
             },
             params: {
-              ID_TRS: "0",
+              ID_TRS: idTrs,
               TRS_PR: "100"
             }
           },
@@ -135,211 +155,14 @@ export default {
               id: item.ID_TRS,
               name: item.TRS_SID
             }));
-            this.form.auto = this.cars.length ? this.cars[0].id : '';
+            this.form.auto = this.cars.length ? this.cars[this.cars.length - 1].id : '';
         }
 
       } catch (error) {
         console.error('Ошибка при загрузке автомобилей:', error);
         alert('Не удалось загрузить список авто');
       }
-    },
-
-
-    async fetchTrailers() {
-      try {
-        const session = localStorage.getItem('session');
-        const response = await axios.post(
-          'http://localhost:8010/proxy/aextrip/rt',
-          {
-            init: {
-              type: "table",
-              report: "at.getListTrs.r"
-            },
-            params: {
-              ID_TRS: "0",
-              TRS_PR: "12"
-            }
-          },
-          {
-            headers: {
-              Pragma: session,
-              "Content-Type": "application/json"
-            }
-          }
-        );
-        
-        if (response.data?.ALL_DATA?.result) {
-          this.trailers = response.data.ALL_DATA.result
-            .filter(item => item.ID_TRS && item.TRS_SID)
-            .map(item => ({
-              id: item.ID_TRS,
-              name: item.TRS_SID
-            }));
-            this.form.trailer = this.trailers.length ? this.trailers[0].id : '';
-        }
-
-      } catch (error) {
-        console.error('Ошибка при загрузке прицепов:', error);
-        alert('Не удалось загрузить список прицепов');
-      }
-    },
-
-    async fetchDriversAndForwarders() {
-      try {
-        const session = localStorage.getItem('session');
-
-        const response = await axios.post(
-          'http://localhost:8010/proxy/aextrip/rt',
-          {
-            init: {
-              type: "table",
-              report: "at.getListDriver.r"
-            },
-            params: {
-              ID_SOTR1: "0",
-              ID_KG: "1",
-              PR_DRV: "1"
-            }
-          },
-          {
-            headers: {
-              Pragma: session,
-              "Content-Type": "application/json"
-            }
-          },
-
-        );        
-        
-        const data = response.data.ALL_DATA.result;
-
-        this.drivers = data
-        .filter(item => item.VID_SOTR && item.VSOTR_FULLNAME)
-        .map(item => ({
-          id: item.VID_SOTR,
-          name: item.VSOTR_FULLNAME
-        }));
-
-        this.form.driver = this.drivers.length ? this.drivers[0].id : '';
-        
-        this.forwarders = data
-        .filter(item => item.VID_SOTR && item.VSOTR_FULLNAME)
-        .map(item => ({
-          id: item.VID_SOTR,
-          name: item.VSOTR_FULLNAME
-        }));
-
-        this.form.forwarder = this.forwarders.length ? this.forwarders[0].id : '';
-
-      } catch (error) {
-        console.error('Ошибка при загрузке водителей:', error);
-        alert('Не удалось загрузить список водителей');
-      }
-    },
-
-    async fetchStations() {
-      try {
-        const session = localStorage.getItem('session');
-        const response = await axios.post(
-          'http://localhost:8010/proxy/aextrip/rt',
-          {
-            init: {
-              type: "table",
-              report: "at.getListMstAexTrip.r"
-            },
-            params: {
-              "ID_MST": "0"
-            }
-          },
-          {
-            headers: {
-              Pragma: session,
-              "Content-Type": "application/json"
-            }
-          }
-        );
-        
-        if (response.data?.ALL_DATA?.result) {
-          this.stations = response.data.ALL_DATA.result
-            .filter(item => item.ID_MST && item.MST_NAME)
-            .map(item => ({
-              id: item.ID_MST,
-              name: item.MST_NAME,
-              cityId: item.MST_ID_KG
-            }));
-
-            this.form.station = this.stations.length ? this.stations[0].id : '';
-        }
-      } catch (error) {
-        console.error('Ошибка при загрузке станций:', error);
-        alert('Не удалось загрузить список станций');
-      }
-    },
-
-    formatCustomDate(dateTimeString) {
-      const dateObj = new Date(dateTimeString);
-
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      const hours = String(dateObj.getHours()).padStart(2, '0');
-      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-      
-      return `${day}.${month}.${year} ${hours}:${minutes}`;
-    },
-    
-
-    async submitForm() {
-      try {
-        const session = localStorage.getItem('session');
-        
-        // Город по выбранной станции
-        const selectedStation = this.stations.find(st => st.id === this.form.station);
-        const cityId = selectedStation ? selectedStation.cityId : null;
-
-        const formattedDeparture = this.formatCustomDate(this.form.departure);
-        const formattedArrival = this.formatCustomDate(this.form.arrival);
-
-        const response = await axios.post(
-          'http://localhost:8010/proxy/aextrip/rt',
-          {
-            init: {
-              type: "data",
-              report: "at.setInsUpdAexTrip.w"
-            },
-            params: {
-              // ID_AEX_TRIP: "",
-              "AEX_TRIP_ID_TRS": this.form.auto,             // ТС
-              "AEX_TRIP_ID_KG": cityId,                       // Город станции
-              "AEX_TRIP_ID_MST": this.form.station,           // Станция начала
-              "AEX_TRIP_ID_SOTR1": this.form.driver,          // Водитель
-              "AEX_TRIP_ID_EXP": this.form.forwarder,         // Экспедитор
-              "AEX_TRIP_DT_BG": formattedDeparture,          // Дата и время начала
-              "AEX_TRIP_DT_END": formattedArrival,           // Дата и время конца
-              "AEX_TRIP_VID": 0,                              // Всегда 0
-              "AEX_TRIP_ID_MST_FINISH": this.form.station,    // Станция завершения
-              "AEX_TRIP_ID_TRS_PRIC": this.form.trailer,      // Прицеп
-              "AEX_TRIP_TXT": this.form.note                  // Примечание
-            }
-          },
-          {
-            headers: {
-              Pragma: session,
-              "Content-Type": "application/json"
-            }
-          }
-        );
-        
-        console.log('Ответ сервера:', response.data);
-        alert('Задание успешно добавлено!');
-        this.isOpen = false;
-      
-      } catch (error) {
-        console.error('Ошибка при добавлении задания:', error);
-        alert('Ошибка при добавлении задания');
-      }
-    },
-    
-    
+    },   
     
   }
 };

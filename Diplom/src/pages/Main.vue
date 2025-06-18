@@ -5,7 +5,8 @@
     <Filters class="filters"
       @update-deleted-filter="onDeletedFilterUpdate"
       @update-task-number-filter="onTaskNumberFilterUpdate"
-      @update-date-filter="onDateFilterUpdate">
+      @update-date-filter="onDateFilterUpdate"
+      @update-number-filter="onNumberFilterUpdate">
       
     </Filters>
 
@@ -14,6 +15,7 @@
         :taskNumberFilter="taskNumberFilter"
         :deletedFilter="deletedFilter"
         :dateFilter="dateFilter"
+        :numberFilter="numberFilter"
         @select-task="onSelectTask">
       </Tasks>
 
@@ -82,6 +84,14 @@ export default {
         from: '',
         to: ''
       },
+
+      numberFilter: {
+        enabled: false,
+        selected: '',
+        input: ''
+      },
+
+      
     };
   },
   methods: {
@@ -110,6 +120,9 @@ export default {
       this.dateFilter = filter
     },
 
+    onNumberFilterUpdate(filter){
+      this.numberFilter = filter
+    },
 
   }
 }

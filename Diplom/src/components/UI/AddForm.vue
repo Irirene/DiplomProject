@@ -130,7 +130,7 @@ export default {
             },
             params: {
               ID_TRS: "0",
-              TRS_PR: "100"
+              TRS_PR: "2"
             }
           },
           {

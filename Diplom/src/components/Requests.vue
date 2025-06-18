@@ -9,7 +9,7 @@
             class="task-list ag-theme-alpine" 
             :rowData="rowData" 
             :columnDefs="columnDefs"
-            rowSelection="single">
+            :rowSelection="{ mode: 'singleRow' }">
             </ag-grid-vue>
         </div>
 

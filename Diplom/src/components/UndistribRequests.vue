@@ -14,7 +14,7 @@
     class="unrequests-list" 
     :rowData="rowData" 
     :columnDefs="columnDefs" 
-    rowSelection="multiple"
+    :rowSelection="{ mode: 'singleRow' }"
      @rowClicked="onRowClicked">
     </ag-grid-vue>
 
@@ -66,7 +66,8 @@ export default {
         async function GetUnRequests(taskId, taskDate) {
             try {
                 const session = getCookie('session');
-                const onlyDate = taskDate ? taskDate.split(' ')[0] : '';
+                const dateWithTime = props.taskDate;
+                const onlyDate = dateWithTime ? dateWithTime.split(' ')[0] : '';
 
                 const body = {
                     "init": {
@@ -128,7 +129,7 @@ export default {
 
         async function onButtonClick() {
             if (!selectedRow.value) {
-                alert("Выберите строку для отправки запроса");
+                alert("Выберите нераспределенную заявку");
                 return;
             }
             const body = {
@@ -155,11 +156,11 @@ export default {
                         }
                     }
                 );
-                alert("Запрос выполнен успешно");
+                alert("Заявка распределена");
                 await GetUnRequests(props.taskId, props.taskDate);
             } catch (error) {
                 console.error("Ошибка при выполнении запроса:", error);
-                alert("Ошибка при выполнении запроса");
+                alert("Ошибка при распределении заявки");
             }
         }
 

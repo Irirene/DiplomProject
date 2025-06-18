@@ -215,9 +215,6 @@ export default {
     
     const format = (date) => date.toISOString().slice(0, 10);
 
-
-
-
     return {
       searches: ['...abc', '...abc...', 'abc'],
 
@@ -292,7 +289,14 @@ export default {
         this.$emit('update-date-filter', {...newVal});
       },
       deep: true
-    }
+    },
+
+    numberFilter: {
+      handler(newVal) {
+        this.$emit('update-number-filter', {...newVal});
+      },
+      deep: true
+    },
   },
 
   methods: {
