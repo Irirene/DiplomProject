@@ -93,22 +93,76 @@ export default {
     };
   },
 
-  props: { 
-    task: { type: Object, default: null },
-    idTrs: { type: [String, Number], default: null }
+  props: {
+    idTask: { type: [String, Number], default: null },
+    idTrs: { type: [String, Number], default: null },
+    idTrsPric: { type: [String, Number], default: null },
+    idSotr: { type: [String, Number], default: null },
+    idKg: { type: [String, Number], default: null },
+    idExp: { type: [String, Number], default: null },
+    idMst: { type: [String, Number], default: null },
+    dateBg: { type: [String, Number], default: null },
+    dateEnd: { type: [String, Number], default: null },
+    note: { type: [String, Number], default: null },
   },
 
   watch:{
     isOpen(newVal) {
       if (newVal) {
+        this.resetForm();
         this.fetchCars(this.idTrs);
+        this.fetchTrailers(this.idTrsPric);
+        this.fetchDrivers(this.idSotr, this.idKg);
+        this.fetchForwarders(this.idExp, this.idKg);
+        this.fetchStations(this.idMst);
+        this.DateAndNote(this.dateBg, this.dateEnd, this.note)
       }
     },
     idTrs(newVal) {
       if (this.isOpen && newVal) {
-        this.fetchCars(newVal);
+        this.fetchCars(newVal);       
       }
-    }
+    },
+    idTrsPric(newVal){
+      if (this.isOpen && newVal) {
+        this.fetchTrailers(newVal);        
+      }
+    },
+    idSotr(newVal) {
+      if (this.isOpen && newVal) {
+        this.fetchDrivers(newVal, this.idKg);
+      }
+    },
+    idKg(newVal) {
+      if (this.isOpen && newVal) {
+        this.fetchDrivers(this.idSotr, newVal);
+      }
+    },
+    idExp(newVal) {
+      if (this.isOpen && newVal) {
+        this.fetchForwarders(newVal, this.idKg);
+      }
+    },
+    idMst(newVal) {
+      if (this.isOpen && newVal) {
+        this.fetchStations(newVal);
+      }
+    },
+    dateBg(newVal) {
+      if (this.isOpen && newVal) {
+        this.DateAndNote(newVal, this.dateEnd, this.note);
+      }
+    },
+    dateEnd(newVal) {
+      if (this.isOpen && newVal) {
+        this.DateAndNote(this.dateBg, newVal, this.note);
+      }
+    },
+    note(newVal) {
+      if (this.isOpen && newVal) {
+        this.DateAndNote(this.dateBg, this.dateEnd, newVal);
+      }
+    },
   },
 
   
@@ -124,6 +178,18 @@ export default {
       }
       return null;
     },
+    resetForm() {
+      this.form = {
+        auto: '',
+        trailer: '',
+        driver: '',
+        forwarder: '',
+        departure: '',
+        arrival: '',
+        station: '',
+        note: ''
+      };
+    },
 
     async fetchCars(idTrs) {
       try {
@@ -137,7 +203,7 @@ export default {
             },
             params: {
               ID_TRS: idTrs,
-              TRS_PR: "100"
+              TRS_PR: "2"
             }
           },
           {
@@ -155,15 +221,298 @@ export default {
               id: item.ID_TRS,
               name: item.TRS_SID
             }));
-            this.form.auto = this.cars.length ? this.cars[this.cars.length - 1].id : '';
+            
+            const exists = this.cars.some(car => car.id === idTrs);
+            
+            if (exists) {
+              this.form.auto = idTrs;
+            } else {
+              this.form.auto = this.cars.length ? this.cars[0].id : '';
+            }
+          }
+        } catch (error) {
+          console.error('Ошибка при загрузке автомобилей:', error);
+          alert('Не удалось загрузить список авто');
+        }
+      },
+      
+      
+      async fetchTrailers(idTrsPric) {
+      try {
+        const session = this.getCookie('session');
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListTrs.r"
+            },
+            params: {
+              ID_TRS: idTrsPric,
+              TRS_PR: "12"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        if (response.data?.ALL_DATA?.result) {
+          this.trailers = response.data.ALL_DATA.result
+            .filter(item => item.ID_TRS && item.TRS_SID)
+            .map(item => ({
+              id: item.ID_TRS,
+              name: item.TRS_SID
+            }));
+            
+            const exists = this.trailers.some(trailer => trailer.id === idTrsPric);
+            
+            if (exists) {
+              this.form.trailer = idTrsPric;
+            } else {
+              this.form.trailer = this.trailers.length ? this.trailers[0].id : '';
+            }
+          }
+        } catch (error) {
+          console.error('Ошибка при загрузке прицепов:', error);
+          alert('Не удалось загрузить список прцепов');
+        }
+      },
+
+
+      async fetchDrivers(idSotr, idKg) {
+      try {
+        const session = this.getCookie('session');
+
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListDriver.r"
+            },
+            params: {
+              ID_SOTR1: idSotr,
+              ID_KG: idKg,
+              PR_DRV: "1"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          },
+
+        );        
+        
+        const data = response.data.ALL_DATA.result;
+
+        this.drivers = data
+        .filter(item => item.VID_SOTR && item.VSOTR_FULLNAME)
+        .map(item => ({
+          id: item.VID_SOTR,
+          name: item.VSOTR_FULLNAME
+        }));
+
+        this.form.driver = this.drivers.length ? this.drivers[0].id : '';
+        const exists = this.drivers.some(driver => driver.id === idSotr);
+        
+        if (exists) {
+          this.form.driver = idSotr;
+        } else {
+          this.form.driver = this.drivers.length ? this.drivers[0].id : '';
         }
 
       } catch (error) {
-        console.error('Ошибка при загрузке автомобилей:', error);
-        alert('Не удалось загрузить список авто');
+        console.error('Ошибка при загрузке водителей:', error);
+        alert('Не удалось загрузить список водителей');
       }
-    },   
-    
+    },
+
+    async fetchForwarders(idExp, idKg) {
+      try {
+        const session = this.getCookie('session');
+
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListDriver.r"
+            },
+            params: {
+              ID_SOTR1: idExp,
+              ID_KG: idKg,
+              PR_DRV: "1"
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          },
+
+        );        
+        
+        const data = response.data.ALL_DATA.result;
+
+        this.forwarders = data
+        .filter(item => item.VID_SOTR && item.VSOTR_FULLNAME)
+        .map(item => ({
+          id: item.VID_SOTR,
+          name: item.VSOTR_FULLNAME
+        }));
+
+        this.form.forwarder = this.forwarders.length ? this.forwarders[0].id : '';
+        const exists = this.forwarders.some(forwarder => forwarder.id === idExp);
+        
+        if (exists) {
+          this.form.forwarder = idExp;
+        } else {
+          this.form.forwarder = this.forwarders.length ? this.forwarders[0].id : '';
+        }
+
+      } catch (error) {
+        console.error('Ошибка при загрузке экспедиторов:', error);
+        alert('Не удалось загрузить список экспедиторов');
+      }
+    },
+
+
+    async fetchStations(idMst) {
+      try {
+        const session = this.getCookie('session');
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "table",
+              report: "at.getListMstAexTrip.r"
+            },
+            params: {
+              "ID_MST": idMst
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        if (response.data?.ALL_DATA?.result) {
+          this.stations = response.data.ALL_DATA.result
+            .filter(item => item.ID_MST && item.MST_NAME)
+            .map(item => ({
+              id: item.ID_MST,
+              name: item.MST_NAME,
+              cityId: item.MST_ID_KG
+            }));
+
+            this.form.station = this.stations.length ? this.stations[0].id : '';
+            const exists = this.stations.some(station => station.id === idMst);
+            
+            if (exists) {
+              this.form.station = idMst;
+            } else {
+              this.form.station = this.stations.length ? this.stations[0].id : '';
+            }
+          }
+      } catch (error) {
+        console.error('Ошибка при загрузке станций:', error);
+        alert('Не удалось загрузить список станций');
+      }
+    },
+
+
+    DateAndNote(dateBg, dateEnd, note) {      
+      // console.log('dateBg:', dateBg, 'dateEnd:', dateEnd, 'note:', note);
+      this.form.note = note || '';
+      this.form.departure = this.formatDateTimeLocal(dateBg);
+      this.form.arrival = this.formatDateTimeLocal(dateEnd);
+    },
+
+    formatDateTimeLocal(dateStr) {
+      if (!dateStr) return '';
+      const match = /^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{1,2}):(\d{2})/.exec(dateStr);
+      if (!match) return '';
+      const [_, day, month, year, hour, minute] = match;
+      return `${year}-${month}-${day}T${hour.padStart(2, '0')}:${minute}`;
+    },
+
+    formatCustomDate(dateTimeString) {
+      const dateObj = new Date(dateTimeString);
+
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }, 
+
+
+    async submitForm() {
+      try {
+        const session = this.getCookie('session');
+        
+        // Город по выбранной станции
+        const selectedStation = this.stations.find(st => st.id === this.form.station);
+        const cityId = selectedStation ? selectedStation.cityId : null;
+
+        const formattedDeparture = this.formatCustomDate(this.form.departure);
+        const formattedArrival = this.formatCustomDate(this.form.arrival);
+
+        const response = await axios.post(
+          'http://localhost:8010/proxy/aextrip/rt',
+          {
+            init: {
+              type: "data",
+              report: "at.setInsUpdAexTrip.w"
+            },
+            params: {
+              "ID_AEX_TRIP": this.idTask,                    //Код задания
+              "AEX_TRIP_ID_TRS": this.form.auto,             // ТС
+              "AEX_TRIP_ID_KG": cityId,                       // Город станции
+              "AEX_TRIP_ID_MST": this.form.station,           // Станция начала
+              "AEX_TRIP_ID_SOTR1": this.form.driver,          // Водитель
+              "AEX_TRIP_ID_EXP": this.form.forwarder,         // Экспедитор
+              "AEX_TRIP_DT_BG": formattedDeparture,          // Дата и время начала
+              "AEX_TRIP_DT_END": formattedArrival,           // Дата и время конца
+              "AEX_TRIP_VID": 0,                              // Всегда 0
+              "AEX_TRIP_ID_MST_FINISH": this.form.station,    // Станция завершения
+              "AEX_TRIP_ID_TRS_PRIC": this.form.trailer,      // Прицеп
+              "AEX_TRIP_TXT": this.form.note                  // Примечание
+            }
+          },
+          {
+            headers: {
+              Pragma: session,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        
+        // console.log('Ответ сервера:', response.data);
+        alert('Задание успешно отредактировано!');
+        this.$emit('updated');
+        this.isOpen = false;       
+      
+      } catch (error) {
+        console.error('Ошибка при редактировании задания:', error);
+        alert('Ошибка при редактировании задания');
+      }
+    },
+
+
+
   }
 };
 

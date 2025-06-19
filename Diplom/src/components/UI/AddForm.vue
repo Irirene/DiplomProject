@@ -343,7 +343,7 @@ export default {
           }
         );
         
-        console.log('Ответ сервера:', response.data);
+        // console.log('Ответ сервера:', response.data);
         alert('Задание успешно добавлено!');
         this.isOpen = false;
       

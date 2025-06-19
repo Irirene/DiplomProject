@@ -4,7 +4,17 @@
 
       <AddForm></AddForm>
 
-      <EditForm :idTrs="selectedTrsId"> </EditForm>
+      <EditForm :idTask="selectedTaskId"
+      :idTrs="selectedTrsId"
+      :idTrsPric="selectedTrsPricId"
+      :idSotr="selectedSotrId"
+      :idKg="selectedKgId"
+      :idExp="selectedExpId"
+      :idMst="selectedMstId"
+      :dateBg="selectedDateBg"
+      :dateEnd="selectedDateEnd"
+      :note="selectedNote"
+      @updated="loadData"> </EditForm>
 
       <div class="dropdown">
         <button class="task_buttons" @click="toggleDropdown">Диспетчер</button>
@@ -64,6 +74,15 @@ export default {
     const rowData = ref([]);
 
     const selectedTrsId = ref(null);
+    const selectedTrsPricId = ref(null);
+    const selectedSotrId = ref(null);
+    const selectedKgId = ref(null);
+    const selectedExpId = ref(null);
+    const selectedMstId = ref(null);
+    const selectedDateBg = ref(null);
+    const selectedDateEnd = ref(null);
+    const selectedNote = ref(null);
+
     const selectedTaskId = ref(null);
 
     const isDropdownOpen = ref(false);
@@ -267,26 +286,48 @@ export default {
     return {
       columnDefs,
       rowData,
+
       selectedTrsId,
+      selectedTrsPricId,
+      selectedSotrId,
+      selectedKgId,
+      selectedExpId,
+      selectedMstId,
+      selectedDateBg,
+      selectedDateEnd,
+      selectedNote,
+
       selectedTaskId,
+
       isDropdownOpen,
       toggleDropdown,
       planning,
       ready,
       done,
+
+      loadData,
     };
   },
 
   methods: {
     onRowClicked(event) {
       this.selectedTrsId = event.data.AEX_TRIP_ID_TRS;
+      this.selectedTrsPricId = event.data.AEX_TRIP_ID_TRS_PRIC;
+      this.selectedSotrId = event.data.AEX_TRIP_ID_SOTR1;
+      this.selectedKgId = event.data.AEX_TRIP_ID_KG;
+      this.selectedExpId = event.data.AEX_TRIP_ID_EXP;
+      this.selectedMstId = event.data.AEX_TRIP_ID_MST;
+      this.selectedDateBg = event.data.AEX_TRIP_DT_BG;
+      this.selectedDateEnd = event.data.AEX_TRIP_DT_END;
+      this.selectedNote = event.data.AEX_TRIP_TXT;
+
       this.selectedTaskId = event.data.ID_AEX_TRIP;
 
       this.$emit('select-task', {
         id: event.data.ID_AEX_TRIP,
         date: event.data.AEX_TRIP_DT_BG,
       });
-    }
+    },
   }
 };
 </script>
