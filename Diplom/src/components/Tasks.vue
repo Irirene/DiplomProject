@@ -6,9 +6,14 @@
 
       <EditForm :idTrs="selectedTrsId"> </EditForm>
 
-      <button class="task_buttons">
-        <img src="/src/images/del.png" alt="" />
-      </button>
+      <div class="dropdown">
+        <button class="task_buttons" @click="toggleDropdown">Диспетчер</button>
+        <div v-if="isDropdownOpen" class="dropdown-menu">
+          <button @click="planning">В планировании</button>
+          <button @click="ready">Готово к выполнению</button>
+          <button @click="done">Завершено</button>
+        </div>
+      </div>
 
     </div>
 
@@ -59,6 +64,90 @@ export default {
     const rowData = ref([]);
 
     const selectedTrsId = ref(null);
+    const selectedTaskId = ref(null);
+
+    const isDropdownOpen = ref(false);
+
+    function getCurrentDateTime() {
+      const now = new Date();
+      const pad = (n) => n < 10 ? '0' + n : n;
+      return (
+        pad(now.getDate()) + '.' +
+        pad(now.getMonth() + 1) + '.' +
+        now.getFullYear() + ' ' +
+        pad(now.getHours()) + ':' +
+        pad(now.getMinutes()) + ':' +
+        pad(now.getSeconds())
+      );
+    }
+
+
+    async function sendStatusUpdate(reportName) {
+      if (!selectedTaskId.value) {
+        alert("Выберите задание в таблице");
+        return;
+      }
+
+      const session = getCookie('session');
+      const selectedRow = rowData.value.find(row => row.ID_AEX_TRIP === selectedTaskId.value);
+      if (!selectedRow) {
+        alert("Выбранное задание не найдено");
+        return;
+      }
+      
+      const body = {
+        init: {
+          type: "data",
+          report: reportName
+        },
+        params: {
+          aex_strip_id_aex_trip: selectedRow.ID_AEX_TRIP,
+          aex_strip_dt: getCurrentDateTime()
+        }
+      };
+      try {
+        const response = await axios.post(
+          "http://localhost:8010/proxy/aextrip/rt",
+          body,
+          {
+            headers: {
+              Pragma: `${session}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        alert("Статус успешно обновлен");
+        await loadData();
+
+      } catch (error) {
+        console.error("Ошибка при обновлении статуса:", error);
+        alert("Ошибка при обновлении статуса");
+      }
+    }
+
+
+    function toggleDropdown() {
+      isDropdownOpen.value = !isDropdownOpen.value;
+      
+    }
+
+    async function planning() {
+      isDropdownOpen.value = false;
+      await sendStatusUpdate("at.setInsSTrip01710.w");
+      await loadData();
+    }
+
+    async function ready() {
+      isDropdownOpen.value = false;
+      await sendStatusUpdate("at.setInsSTrip01711.w");
+      await loadData();
+    }
+
+    async function done() {
+      isDropdownOpen.value = false;
+      await sendStatusUpdate("at.setInsSTrip01712.w");
+      await loadData();
+    }
 
     function getCookie(name) {
       const nameEQ = name + "=";
@@ -179,12 +268,19 @@ export default {
       columnDefs,
       rowData,
       selectedTrsId,
+      selectedTaskId,
+      isDropdownOpen,
+      toggleDropdown,
+      planning,
+      ready,
+      done,
     };
   },
 
   methods: {
     onRowClicked(event) {
       this.selectedTrsId = event.data.AEX_TRIP_ID_TRS;
+      this.selectedTaskId = event.data.ID_AEX_TRIP;
 
       this.$emit('select-task', {
         id: event.data.ID_AEX_TRIP,
@@ -262,4 +358,38 @@ button {
   max-height: 85%;
   object-fit: contain;
 }
+
+
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+  z-index: 1000;
+}
+
+.dropdown-menu button {
+  padding: 5px 10px;
+  border-top: 1px solid #dad8d8;
+  border-bottom: 1px solid #dad8d8;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  width: 170px;
+}
+
+.dropdown-menu button:hover {
+  background-color: #eee;
+}
+
 </style>
