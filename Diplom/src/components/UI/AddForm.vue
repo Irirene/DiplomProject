@@ -95,6 +95,7 @@ export default {
   watch:{
     isOpen(newVal){
       if (newVal) { 
+        this.resetForm();
         this.fetchCars();
         this.fetchTrailers()
         this.fetchDriversAndForwarders();
@@ -115,6 +116,19 @@ export default {
         if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
       }
       return null;
+    },
+
+    resetForm() {
+      this.form = {
+        auto: '',
+        trailer: '',
+        driver: '',
+        forwarder: '',
+        departure: '',
+        arrival: '',
+        station: '',
+        note: ''
+      };
     },
    
     async fetchCars() {
@@ -345,6 +359,7 @@ export default {
         
         // console.log('Ответ сервера:', response.data);
         alert('Задание успешно добавлено!');
+        this.$emit('updated');
         this.isOpen = false;
       
       } catch (error) {

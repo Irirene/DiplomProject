@@ -2,7 +2,7 @@
   <div class="tasks-outer">
     <div class="buttons">
 
-      <AddForm></AddForm>
+      <AddForm @updated="loadData"></AddForm>
 
       <EditForm :idTask="selectedTaskId"
       :idTrs="selectedTrsId"
