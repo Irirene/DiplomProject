@@ -326,6 +326,7 @@ export default {
       this.$emit('select-task', {
         id: event.data.ID_AEX_TRIP,
         date: event.data.AEX_TRIP_DT_BG,
+        status: Number(event.data.AEX_TSTRIP_MAKE_PR)
       });
     },
   }

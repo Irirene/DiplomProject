@@ -22,7 +22,8 @@
       <ButtonC class="btn-buttom" @click="toggleRequests">
         {{ showRequests ? 'Скрыть заявки' : 'Показать заявки' }}
       </ButtonC>
-      <Requests v-if="showRequests" :taskId="selectedTaskId"></Requests>
+      <Requests v-if="showRequests" :taskId="selectedTaskId"
+      :taskStatus="selectedTaskStatus"></Requests>
     </div>
 
     <template v-if="showUnRequests">
@@ -67,6 +68,8 @@ export default {
       showUnRequests: false,
       selectedTaskId: '',
       selectedTaskDate: '',
+
+      selectedTaskStatus: -1,
 
       
       taskNumberFilter: {
@@ -114,6 +117,7 @@ export default {
     onSelectTask(task) {
       this.selectedTaskId = task.id;
       this.selectedTaskDate = task.date;
+      this.selectedTaskStatus = Number(task.status);
     },
 
     onDateFilterUpdate(filter){
