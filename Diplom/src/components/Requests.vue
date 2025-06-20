@@ -363,13 +363,13 @@ export default {
 .request-table {
     flex: 1 1 auto;
     min-width: 0;
-    height: 325px;
+    height: 310px;
 }
 
 .history-list {
     flex: 1 1 150px;
     min-width: 0;
-    height: 100%;
+    height: 310px;
 }
 
 
