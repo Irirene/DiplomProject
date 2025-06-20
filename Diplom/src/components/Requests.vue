@@ -15,7 +15,7 @@
                     </div>                    
                 </div>
 
-                <button class="requ_buttons" @click="onButtonClick" title="Удалить заявку">
+                <button class="requ_buttons" @click="onButtonClick"  title="Удалить заявку">
                         <img src="/src/images/del.png" alt="" />
                     </button>
             </div>
@@ -132,7 +132,7 @@ export default {
             isDropdownOpen.value = false;
 
             if (props.taskStatus == 2) {
-                alert("Нельзя выполнить для заданий со статусом 2");
+                alert("Нельзя выполнить для заданий с таким статусом");
                 return;
             }
 
@@ -292,9 +292,14 @@ export default {
         }
 
 
-        async function onButtonClick() {
+        async function onButtonClick() {           
+
             if (!selectedRow.value) {
                 alert("Выберите нераспределенную заявку");
+                return;
+            }
+            if (props.taskStatus == 2 || props.taskStatus == 1) {
+                alert("Нельзя выполнить для заданий с таким статусом");
                 return;
             }
             const body = {

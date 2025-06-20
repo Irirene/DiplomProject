@@ -1,6 +1,7 @@
 <template>
   <div>
-    <button @click="isOpen = true" class="task_buttons"><img src="/src/images/editn.jpg" alt=""></button>
+    <button @click="isOpen = true"  class="task_buttons" >
+      <img src="/src/images/editn.jpg" alt=""></button>
     <div v-if="isOpen" class="modal-overlay" @click.self="isOpen = false">
       <div class="modal">
         <h2>Задание экспедитору</h2>
@@ -104,6 +105,7 @@ export default {
     dateBg: { type: [String, Number], default: null },
     dateEnd: { type: [String, Number], default: null },
     note: { type: [String, Number], default: null },
+    statusTask: { type: [String, Number], default: null },
   },
 
   watch:{

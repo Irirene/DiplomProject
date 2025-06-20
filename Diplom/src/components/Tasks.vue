@@ -14,7 +14,9 @@
       :dateBg="selectedDateBg"
       :dateEnd="selectedDateEnd"
       :note="selectedNote"
-      @updated="loadData"> </EditForm>
+      :statusTask="selectedStatus"
+      @updated="loadData" 
+      > </EditForm>
 
       <div class="dropdown">
         <button class="task_buttons" @click="toggleDropdown"> 
@@ -93,6 +95,7 @@ export default {
     const selectedDateBg = ref(null);
     const selectedDateEnd = ref(null);
     const selectedNote = ref(null);
+    const selectedStatus =ref(null);
 
     const selectedTaskId = ref(null);
 
@@ -342,6 +345,7 @@ export default {
       selectedDateBg,
       selectedDateEnd,
       selectedNote,
+      selectedStatus,
 
       selectedTaskId,
 
@@ -368,6 +372,7 @@ export default {
       this.selectedDateBg = event.data.AEX_TRIP_DT_BG;
       this.selectedDateEnd = event.data.AEX_TRIP_DT_END;
       this.selectedNote = event.data.AEX_TRIP_TXT;
+      this.selectedStatus = event.data.AEX_TSTRIP_MAKE_PR;
 
       this.selectedTaskId = event.data.ID_AEX_TRIP;
 
