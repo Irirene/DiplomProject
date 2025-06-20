@@ -12,6 +12,7 @@
 
     <h5>Нераспределенные заявки</h5>
     <ag-grid-vue
+    @grid-ready="onGridReady"
     class="unrequests-list" 
     :rowData="rowData" 
     :columnDefs="columnDefs" 
@@ -50,6 +51,7 @@ export default {
         const columnDefs = ref([]);
         const rowData = ref([]);
         const selectedRow = ref(null);
+        const gridApi = ref(null);
 
         function getCookie(name) {
             const nameEQ = name + "=";
@@ -62,12 +64,19 @@ export default {
             return null;
         }
 
+        function onGridReady(params) {
+            gridApi.value = params.api;
+        }
+
         watch(() => [props.taskId, props.taskDate], async ([newTaskId, newTaskDate]) => {
             if (!newTaskId || !newTaskDate) return;
             await GetUnRequests(newTaskId, newTaskDate);
         }, { immediate: true });
 
         async function GetUnRequests(taskId, taskDate) {
+            if (gridApi.value) {
+                gridApi.value.showLoadingOverlay();
+            }
             try {
                 const session = getCookie('session');
                 const dateWithTime = props.taskDate;
@@ -124,6 +133,10 @@ export default {
                 }
             } catch (error) {
                 console.error("Ошибка при загрузке данных:", error);
+            } finally {
+                if (gridApi.value) {
+                    gridApi.value.hideOverlay();
+                }
             }
         }
 
@@ -171,6 +184,8 @@ export default {
         return {
             columnDefs,
             rowData,
+            gridApi,
+            onGridReady,
             onRowClicked,
             onButtonClick,
         };

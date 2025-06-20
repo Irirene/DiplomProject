@@ -12,13 +12,18 @@
                         <button @click="receiving"
                         :disabled="taskStatus === 2">Получения груза от клиента</button>
                         <button @click="delivery">Выдача груза клиенту</button>
-                    </div>
+                    </div>                    
                 </div>
+
+                <button class="requ_buttons" @click="onButtonClick" title="Удалить заявку">
+                        <img src="/src/images/del.png" alt="" />
+                    </button>
             </div>
 
             <h5>Распределенные заявки</h5>
 
-            <ag-grid-vue 
+            <ag-grid-vue
+            @grid-ready="onGridReady" 
             class="task-list ag-theme-alpine" 
             :rowData="rowData" 
             :columnDefs="columnDefs"
@@ -38,7 +43,9 @@
         
         <HistoryRequests 
             v-if="showHistory" 
-            class="history-list">
+            class="history-list"
+            :taskId="taskId"
+            :idRec="selectedIdRec">
         </HistoryRequests>
     </div>
 
@@ -73,10 +80,13 @@ export default {
         const columnDefs = ref([]);
         const rowData = ref([]);
         const showHistory = ref(false);
+        const gridApi = ref(null);
 
         const selectedRow = ref(null);
 
         const isDropdownOpen = ref(false);
+
+        const selectedIdRec = ref("");
 
         watch(() => props.taskId, async (newTaskId) => {
             if (!newTaskId) return;
@@ -108,6 +118,10 @@ export default {
                 pad(now.getHours()) + ':' +
                 pad(now.getMinutes())
             );
+        }
+        
+        function onGridReady(params) {
+            gridApi.value = params.api;
         }
 
         function toggleDropdown() {
@@ -205,10 +219,14 @@ export default {
 
         function onRowClicked(event) {
             selectedRow.value = event.data;
+            selectedIdRec.value = String(event.data.ID_REC);
         }
 
 
         async function GetRequests(taskId) {
+            if (gridApi.value) {
+                gridApi.value.showLoadingOverlay();
+            }
             try {
                 const session = getCookie('session');
 
@@ -262,6 +280,10 @@ export default {
                 }
             } catch (error) {
                 console.error("Ошибка при загрузке данных:", error);
+            } finally {
+                if (gridApi.value) {
+                    gridApi.value.hideOverlay();
+                }
             }
         }
 
@@ -269,9 +291,49 @@ export default {
             showHistory.value = !showHistory.value;
         }
 
+
+        async function onButtonClick() {
+            if (!selectedRow.value) {
+                alert("Выберите нераспределенную заявку");
+                return;
+            }
+            const body = {
+                "init": {
+                    "type": "data",
+                    "report": "at.setAexTTNTripDel.w"
+                },
+                "params": {
+                    "id_aex_ttntrip": selectedRow.value.ID_AEX_TTNTRIP
+                }
+            };
+            
+            try {
+                const session = getCookie('session');
+                await axios.post(
+                    "http://localhost:8010/proxy/aextrip/rt",
+                    body,
+                    {
+                        headers: {
+                            Pragma: `${session}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+                alert("Заявка удалена");
+                await GetRequests(props.taskId);
+            } catch (error) {
+                console.error("Ошибка при выполнении запроса:", error);
+                alert("Ошибка при удалении заявки");
+            }
+        }
+
         return {
             columnDefs,
             rowData,
+            gridApi,
+            onGridReady,
+
+
             showHistory,
             toggleHistory,
             isDropdownOpen,
@@ -279,8 +341,12 @@ export default {
             receiving,
             delivery,
             onRowClicked,
+            onButtonClick,
+
+            selectedIdRec,
         };
     },
+
 };
 </script>
 
@@ -309,7 +375,9 @@ export default {
 
 .dropdown {
   position: relative;
-  display: inline-block;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .dropdown-menu {
@@ -344,15 +412,22 @@ export default {
   padding: 0;
   margin-left: 10px ;
   background-color: white;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   cursor: pointer;
 }
 
 .requ_buttons img {
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 85%;
+  max-height: 85%;
   object-fit: contain;
+  margin-right: 5px;
 }
 
+.buttons {
+  display: flex;
+  gap: 65px;
+  align-items: center;
+  flex-wrap: wrap;
+}
 </style>

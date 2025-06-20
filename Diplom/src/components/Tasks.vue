@@ -32,7 +32,8 @@
     <h5>Список заданий экспедитору</h5>
 
     <div class="tasks-grid">
-      <ag-grid-vue
+      <ag-grid-vue 
+      @grid-ready="onGridReady"
       class="task-list ag-theme-alpine" 
       :rowData="rowData" 
       :columnDefs="columnDefs"
@@ -81,6 +82,7 @@ export default {
   setup(props) {
     const columnDefs = ref([]);
     const rowData = ref([]);
+    const gridApi = ref(null);
 
     const selectedTrsId = ref(null);
     const selectedTrsPricId = ref(null);
@@ -108,13 +110,17 @@ export default {
         pad(now.getSeconds())
       );
     }
+    
+    function onGridReady(params) {
+      gridApi.value = params.api;
+    }
 
 
     async function sendStatusUpdate(reportName) {
       if (!selectedTaskId.value) {
         alert("Выберите задание в таблице");
         return;
-      }
+      }    
 
       const session = getCookie('session');
       const selectedRow = rowData.value.find(row => row.ID_AEX_TRIP === selectedTaskId.value);
@@ -195,6 +201,9 @@ export default {
     }
 
     async function loadData() {
+      if (gridApi.value) {
+        gridApi.value.showLoadingOverlay();
+      }
       try {
         const session = getCookie('session');
 
@@ -264,6 +273,10 @@ export default {
         }
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
+      } finally {
+        if (gridApi.value) {
+          gridApi.value.hideOverlay();
+        }
       }
     };
 
@@ -317,6 +330,8 @@ export default {
     return {
       columnDefs,
       rowData,
+      gridApi,
+      onGridReady,
 
       selectedTrsId,
       selectedTrsPricId,
