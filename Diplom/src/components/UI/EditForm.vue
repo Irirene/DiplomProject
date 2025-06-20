@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="isOpen = true"  class="task_buttons" >
+    <button @click="handleButtonClick"  class="task_buttons">
       <img src="/src/images/editn.jpg" alt=""></button>
     <div v-if="isOpen" class="modal-overlay" @click.self="isOpen = false">
       <div class="modal">
@@ -120,6 +120,12 @@ export default {
         this.DateAndNote(this.dateBg, this.dateEnd, this.note)
       }
     },
+    statusTask(newVal) {
+      const status = Number(newVal);
+      if (status === 1 || status === 2) {
+        this.isOpen = false;
+      }
+    },
     idTrs(newVal) {
       if (this.isOpen && newVal) {
         this.fetchCars(newVal);       
@@ -169,6 +175,16 @@ export default {
 
   
   methods: {
+
+    handleButtonClick() {
+      // console.log('handleButtonClick, statusTask:', this.statusTask);
+      const status = Number(this.statusTask);
+      if (status === 1 || status === 2) {
+        alert('Статус задания должен быть "в планировании"');
+        return;
+      }
+      this.isOpen = true;
+    },
 
     getCookie(name) {
       const nameEQ = name + "=";
