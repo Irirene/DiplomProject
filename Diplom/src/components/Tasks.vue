@@ -57,6 +57,10 @@ import axios from "axios";
 import AddForm from "./UI/AddForm.vue";
 import EditForm from "./UI/EditForm.vue";
 
+import iconBlue from "@/images/planing.png"
+import iconGreen from "@/images/ready.png"
+import iconRed from "@/images/done.png"
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default {
@@ -247,7 +251,12 @@ export default {
                 backgroundColor: '#4D7CBF',
               },
             }));
-        }
+            const statusColumn = columnDefs.value.find(col => col.field === 'AEX_TSTRIP_MAKE_PR');
+            if (statusColumn) {
+              statusColumn.cellRenderer = StatusIconRenderer;
+              statusColumn.width = 50;
+              }
+            }
         if (data.ALL_DATA && Array.isArray(data.ALL_DATA.result)) {
           rowData.value = data.ALL_DATA.result;
         } else {
@@ -257,6 +266,23 @@ export default {
         console.error("Ошибка при загрузке данных:", error);
       }
     };
+
+    function StatusIconRenderer(params) {
+      const status = params.value;
+      let iconSrc = '';
+      switch (status) {
+        case "0": iconSrc = iconBlue; break;
+        case "1": iconSrc = iconGreen; break;
+        case "2": iconSrc = iconRed; break;
+        default: iconSrc = '';
+      }
+      if (!iconSrc) return '';
+      const img = document.createElement('img');
+      img.src = iconSrc;
+      img.style.width = '18px';
+      img.style.height = '18px';
+      return img;
+    }
 
     onMounted(loadData);
 
@@ -311,6 +337,8 @@ export default {
       done,
 
       loadData,
+
+      StatusIconRenderer,
     };
   },
 
