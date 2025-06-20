@@ -5,7 +5,9 @@
 
             <div class="buttons">
                 <div class="dropdown">
-                    <button class="requ_buttons" @click="toggleDropdown">Диспетчер</button>
+                    <button class="requ_buttons" @click="toggleDropdown">
+                        <img src="/src/images/disp.jpg" alt="" />
+                        Диспетчер</button>
                     <div v-if="isDropdownOpen" class="dropdown-menu">
                         <button @click="receiving"
                         :disabled="taskStatus === 2">Получения груза от клиента</button>
@@ -336,14 +338,20 @@ export default {
 }
 
 .requ_buttons {
-  width: 25px;
-  height: 20px;
+  width: 35px;
+  height: 35px;
   padding: 0;
   margin-left: 10px ;
   background-color: white;
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+
+.requ_buttons img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
 }
 
 </style>

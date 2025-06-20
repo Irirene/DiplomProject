@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="isOpen = true" class="task_buttons"><img src="/src/images/edit.png" alt=""></button>
+    <button @click="isOpen = true" class="task_buttons"><img src="/src/images/editn.jpg" alt=""></button>
     <div v-if="isOpen" class="modal-overlay" @click.self="isOpen = false">
       <div class="modal">
         <h2>Задание экспедитору</h2>

@@ -17,7 +17,9 @@
       @updated="loadData"> </EditForm>
 
       <div class="dropdown">
-        <button class="task_buttons" @click="toggleDropdown">Диспетчер</button>
+        <button class="task_buttons" @click="toggleDropdown"> 
+          <img src="/src/images/disp.jpg" alt="" /> 
+          Диспетчер</button>
         <div v-if="isDropdownOpen" class="dropdown-menu">
           <button @click="planning">В планировании</button>
           <button @click="ready">Готово к выполнению</button>
@@ -388,7 +390,7 @@ button {
 }
 
 .task_buttons {
-  width: 25px;
+  width: 35px;
   height: 30px;
   padding: 0;
   margin: 0;

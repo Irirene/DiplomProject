@@ -43,7 +43,7 @@
 
 
       <!-- Фильтр "Город" -->
-      <fieldset class="filter">
+      <!-- <fieldset class="filter">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="townFilter.enabled" />
@@ -56,29 +56,13 @@
             <option v-for="town in towns" :key="town" :value="town">{{ town }}</option>
           </select>
         </div>
-      </fieldset>
+      </fieldset> -->
 
 
-      <!-- Фильтр "Номер тр. средства" -->
-      <fieldset class="filter">
-        <legend>
-          <label class="filter_legend-label">
-            <input type="checkbox" v-model="numberFilter.enabled" />
-            Номер тр. средства
-          </label>
-        </legend>
-        <div class="filter_inputs">
-          <select v-model="numberFilter.selected" :disabled="!numberFilter.enabled" class="filter_select">
-            <option value="">abc...</option>
-            <option v-for="search in searches" :key="search" :value="search">{{ search }}</option>
-          </select>
-          <input type="text" v-model="numberFilter.input" :disabled="!numberFilter.enabled" placeholder="Введите номер"
-            class="filter_input"></input>
-        </div>
-      </fieldset>
+      
 
       <!-- Фильтр "Ст. получателя" -->
-      <fieldset class="filter">
+      <!-- <fieldset class="filter">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="stationFilter.enabled" />
@@ -91,10 +75,10 @@
             <option v-for="station in stations" :key="station" :value="station">{{ station }}</option>
           </select>
         </div>
-      </fieldset>
+      </fieldset> -->
 
       <!-- Фильтр "СДГ (ст. назн)" -->
-      <fieldset class="filter">
+      <!-- <fieldset class="filter">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="sdgFilter.enabled" />
@@ -107,12 +91,14 @@
             <option v-for="station in stations" :key="station" :value="station">{{ station }}</option>
           </select>
         </div>
-      </fieldset>
+      </fieldset> -->
+    
     </div>
 
     <div class="Low_filters">
+
       <!-- Вид перевозки -->
-      <fieldset class="filter first_row">
+      <!-- <fieldset class="filter first_row">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="transportFilter.enabled" />
@@ -125,8 +111,25 @@
             <option v-for="vid in vids" :key="vid" :value="vid">{{ vid }}</option>
           </select>
         </div>
-      </fieldset>
+      </fieldset> -->
 
+      <!-- Фильтр "Номер тр. средства" -->
+      <fieldset class="filter first_row">
+        <legend>
+          <label class="filter_legend-label">
+            <input type="checkbox" v-model="numberFilter.enabled" />
+            Номер тр. средства
+          </label>
+        </legend>
+        <div class="filter_inputs">
+          <!-- <select v-model="numberFilter.selected" :disabled="!numberFilter.enabled" class="filter_select">
+            <option value="">abc...</option>
+            <option v-for="search in searches" :key="search" :value="search">{{ search }}</option>
+          </select> -->
+          <input type="text" v-model="numberFilter.input" :disabled="!numberFilter.enabled" placeholder="Введите номер"
+            class="filter_inputs"></input>
+        </div>
+      </fieldset>
 
       <!-- Фильтр "№ задания" -->
       <fieldset class="filter second_row">
@@ -144,7 +147,7 @@
 
 
       <!-- Фильтр "Экспедитор" -->
-      <fieldset class="filter">
+      <!-- <fieldset class="filter">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="expeditorFilter.enabled" />
@@ -159,11 +162,11 @@
           <input type="text" v-model="expeditorFilter.input" :disabled="!expeditorFilter.enabled" placeholder="Введите"
             class="filter_input"></input>
         </div>
-      </fieldset>
+      </fieldset> -->
 
 
       <!-- Фильтр "Наименование груза" -->
-      <fieldset class="filter">
+      <!-- <fieldset class="filter">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="cargoNameFilter.enabled" />
@@ -178,10 +181,10 @@
           <input type="text" v-model="cargoNameFilter.input" :disabled="!cargoNameFilter.enabled" placeholder="Введите"
             class="filter_input"></input>
         </div>
-      </fieldset>
+      </fieldset> -->
 
       <!-- Фильтр "Клиент-отправитель" -->
-      <fieldset class="filter">
+      <!-- <fieldset class="filter">
         <legend>
           <label class="filter_legend-label">
             <input type="checkbox" v-model="clientFilter.enabled" />
@@ -196,7 +199,7 @@
           <input type="text" v-model="clientFilter.input" :disabled="!clientFilter.enabled" placeholder="Введите"
             class="filter_input"></input>
         </div>
-      </fieldset>
+      </fieldset> -->
 
 
     </div>

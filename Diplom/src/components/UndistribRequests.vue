@@ -4,6 +4,7 @@
 
       <button class="req_buttons" @click="onButtonClick" title="Распределить заявку">
         <img src="/src/images/rasp.png" alt="" />
+        Распределить заявку
       </button>
 
     </div>
@@ -193,14 +194,16 @@ export default {
 } */
 
 .req_buttons {
-  width: 20px;
+  width: 35px;
   height: 25px;
   padding: 0;
   margin: 0;
   background-color: white;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   cursor: pointer;
+  gap: 3px;
+  white-space: nowrap;
 }
 
 .req_buttons img {
