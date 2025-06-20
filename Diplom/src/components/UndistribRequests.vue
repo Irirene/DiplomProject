@@ -14,7 +14,10 @@
     class="unrequests-list" 
     :rowData="rowData" 
     :columnDefs="columnDefs" 
-    :rowSelection="{ mode: 'singleRow' }"
+    :rowSelection="{ 
+                mode: 'singleRow',
+                enableClickSelection: true 
+                }"
      @rowClicked="onRowClicked">
     </ag-grid-vue>
 

@@ -20,7 +20,10 @@
             class="task-list ag-theme-alpine" 
             :rowData="rowData" 
             :columnDefs="columnDefs"
-            :rowSelection="{ mode: 'singleRow' }"
+            :rowSelection="{ 
+                mode: 'singleRow',
+                enableClickSelection: true 
+                }"
             @rowClicked="onRowClicked">
             </ag-grid-vue>
         </div>
@@ -78,9 +81,9 @@ export default {
             await GetRequests(newTaskId);
         }, { immediate: true });
 
-        watch(() => props.taskStatus, (newVal) => {
-  console.log("Получено значение taskStatus:", newVal);
-}, { immediate: true });
+        // watch(() => props.taskStatus, (newVal) => {
+        //     console.log("Получено значение taskStatus:", newVal);
+        // }, { immediate: true });
 
         function getCookie(name) {
             const nameEQ = name + "=";
