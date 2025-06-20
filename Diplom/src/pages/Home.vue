@@ -55,21 +55,15 @@ export default {
             }
             document.cookie = name + "=" + (value || "") + expires + "; path=/; Secure; SameSite=Strict";
         },
-
-        // getCookie(name) {
-        //     const nameEQ = name + "=";
-        //     const ca = document.cookie.split(';');
-        //     for(let i=0;i < ca.length;i++) {
-        //         let c = ca[i];
-        //         while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        //         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-        //     }
-        //     return null;
-        // },
-
+        base64EncodeUnicode(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        },
 
         async reg() {
             try {
+
+                const credentials = `${this.login}:${this.password}`;
+                const encodedCredentials = this.base64EncodeUnicode(credentials);
 
                 //Получение сессии
                 const sessionResponse = await axios.post(
@@ -80,7 +74,7 @@ export default {
                     },
                     {
                         headers: {
-                            'Authorization': 'Basic 0JDQvdC00LjQtdCy0LDQmNCaOjQ0ODI1Nw==',
+                            'Authorization': 'Basic ' + encodedCredentials,
                             'Content-Type': 'application/json'
                         }
                     }
@@ -113,6 +107,8 @@ export default {
                 alert(`Ошибка авторизации: ${error.response?.data?.message || error.message}`);
             }
         },
+        
+
 
         logout() {
             this.setCookie('session', '', -1); //очистить все ключи
