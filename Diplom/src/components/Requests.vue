@@ -297,6 +297,7 @@ export default {
 .request-table {
     flex: 1 1 auto;
     min-width: 0;
+    height: 325px;
 }
 
 .history-list {
